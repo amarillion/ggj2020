@@ -22,6 +22,8 @@ class Game extends Phaser.Game {
 	}
 }
 
+const TILES_IMG = "sprites1";
+
 class GameState {
 	
 	// called once per session
@@ -29,9 +31,55 @@ class GameState {
 		console.log("GameState.constructor");
 	}
 
+	preload() {		
+		this.load.image(TILES_IMG, "assets/placeholder-sprites.png");
+		this.load.tilemap("level", "assets/placeholder-level.json", null, Phaser.Tilemap.TILED_JSON);
+	}
+
 	// called everytime state is entered
 	create () {
 		console.log("GameState.create");
+		this.game.stage.smoothed = false; // disable antialiasing
+
+		// create a tilemap
+		this.map = this.game.add.tilemap("level");
+		console.log(this.map);
+		this.map.addTilesetImage("sprites", TILES_IMG);
+		this.l1 = this.map.createLayer("Tile Layer 1");
+		console.log(this.l1);
+		this.l1.scale.setTo(6.0);
+		this.l1.resizeWorld();
+
+		const map = this.map;
+
+		let player;
+		let goal;
+
+		// extract player, target and and enemy locations
+		for (let x = 0; x < map.width; ++x) {
+			for (let y = 0; y < map.height; ++y) {
+				const tile = map.getTile(x, y);
+				const index = tile && tile.index;
+				switch (index) {
+				case 1: // wall
+					break;
+				case 2: // player
+					player = tile;
+					break;
+				case 7: // open area
+					break;
+				case 3: // goal
+					goal = tile;
+					break;
+				case 4: // enemy
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		
+		console.log ({player, goal});
 
 		const text = "- phaser -\n with a sprinkle of \n pixi dust.";
 		const style = { font: "65px Arial", fill: "#ff0044", align: "center" };
