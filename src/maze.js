@@ -1,5 +1,8 @@
 import { assert } from "./assert";
 
+export const TILE_WIDTH = 8;
+export const TILE_HEIGHT = 8;
+
 /*
 Generate a maze
 */
@@ -117,12 +120,70 @@ export class Grid {
 				const cell = this.get(x, y);
 				top += "   " + (cell.linked(EAST) ? " " : "|");
 				bottom += (cell.linked(SOUTH) ? "   " : "---") + "+";
-
 			}
+
 			output += top + "\n";
 			output += bottom + "\n";
 		}
 		return output;
+	}
+
+	convertToMap(map) {
+		const SCALE = 5;
+
+		const WALL_TILE = 0;
+		const EMPTY_TILE = 6;
+		const GOAL_TILE = 2;
+		const START_TILE = 1;
+
+		const mapw = this.w * SCALE + 1;
+		const maph = this.h * SCALE + 1;
+
+		// const map = new Phaser.Tilemap(game, TILE_WIDTH, TILE_HEIGHT, this.w * SCALE + 1, this.h * SCALE + 1);
+		// const layer = map.create(this.w * SCALE + 1, this.h * SCALE + 1, TILE_WIDTH, TILE_HEIGHT);
+		const layer = map.create('level1', mapw, maph, TILE_WIDTH, TILE_HEIGHT);
+
+		// clear the entire map
+		for (let x = 0; x < mapw; ++x) {
+			for (let y = 1; y < maph - 1; ++y) {
+				map.putTile(EMPTY_TILE, x, y);
+			}
+		}
+
+		// draw a box around
+		for (let x = 0; x < mapw; ++x) {
+			map.putTile(WALL_TILE, x, 0);
+			map.putTile(WALL_TILE, x, maph-1);
+		}
+		for (let y = 1; y < maph - 1; ++y) {
+			map.putTile(WALL_TILE, 0, y);
+			map.putTile(WALL_TILE, mapw-1, y);
+		}
+
+		map.putTile(START_TILE, mapw - 4, 2);
+		map.putTile(GOAL_TILE, 2, maph - 4);
+	
+		this.eachCell(cell => {
+			const xx = cell.x * SCALE;
+			const yy = cell.y * SCALE;
+			
+			// draw EAST
+			if (!cell.linked(EAST)) {
+				for (let d = 0; d < SCALE + 1; ++d) {
+					map.putTile(WALL_TILE, xx + SCALE, yy + d);
+				}
+			}
+
+			// draw SOUTH
+			if (!cell.linked(SOUTH)) {
+				for (let d = 0; d < SCALE + 1; ++d) {
+					map.putTile(WALL_TILE, xx + d, yy + SCALE);
+				}
+			}
+			
+		});
+
+		return layer;
 	}
 }
 
