@@ -6,6 +6,7 @@
 import 'expose-loader?PIXI!phaser-ce/build/custom/pixi.js';
 import 'expose-loader?p2!phaser-ce/build/custom/p2.js';
 import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js';
+import { Grid, binaryTree } from './maze';
 
 class Game extends Phaser.Game {
 	
@@ -49,16 +50,19 @@ class GameState {
 		this.game.physics.startSystem(Phaser.Physics.ARCADE);
 		this.game.physics.arcade.gravity.y = 0;
 
+		const grid = new Grid(10, 10);
+		binaryTree(grid);
+	
 		// create a tilemap
-		this.map = this.game.add.tilemap("level");
-		console.log(this.map);
-		this.map.addTilesetImage("sprites", TILES_IMG);
-		this.l1 = this.map.createLayer("Tile Layer 1");
-		console.log(this.l1);
-		this.l1.scale.setTo(6.0);
-		this.l1.resizeWorld();
-
+		this.map = this.game.add.tilemap();
+		this.map.setTileSize(8, 8);
+		this.map.addTilesetImage(TILES_IMG);
 		const map = this.map;
+
+		this.l1 = grid.convertToMap(this.map);
+
+		this.l1.scale.setTo(3.0);
+		this.l1.resizeWorld();
 
 		let playerTile;
 		let goal;
