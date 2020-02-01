@@ -99,6 +99,10 @@ class GameState {
 		this.map.setCollision(WALL_TILE, true, this.l1);
 		
 		this.player = this.game.add.sprite(100, 100, SPRITESHEET, START_TILE);
+		this.player.animations.add('idle', [ 0x00, 0x01, 0x02 ], 3, true);
+		this.player.animations.add('walk', [ 0x03, 0x04 ], 2, true);
+		this.player.animations.play('walk');
+
 		this.monsters = this.game.add.group();
 		this.initMonsters();
 
@@ -157,6 +161,11 @@ class GameState {
 		for (let i = 0; i < count; i++ ) {
 			//let newMonster = this.game.add.sprite(100, 110, SPRITESHEET, 5);
 			let newMonster = this.monsters.create(100, 110, SPRITESHEET, ENEMY_TILE);
+			newMonster.animations.add('idle', [ 0x10, 0x11, 0x12 ], 3, true);
+			newMonster.animations.add('walk', [ 0x13, 0x14 ], 2, true);
+			newMonster.animations.play('walk');
+		
+			
 			this.game.physics.arcade.enable(newMonster, Phaser.Physics.ARCADE);
 
 			newMonster.anchor.set(0.5);
