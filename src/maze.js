@@ -30,7 +30,6 @@ export class Cell {
 	}
 
 	link(other, dir, bidi=true, linkType = 1) {
-		console.log({other, dir});
 		if (dir in this.links) {
 			console.log("WARNING: creating link that already exists");
 		}
@@ -52,6 +51,10 @@ export class Cell {
 	unlink(other, bidi=true) {
 		console.log({other, bidi});
 		assert(false, "Unimplemented");
+	}
+
+	listNeighbors() {
+		return Object.entries(this.links);
 	}
 }
 
@@ -92,6 +95,19 @@ export class Grid {
 		return this.data[this._index(x, y)];
 	}
 
+	// list neighbors, not necessarily linked
+	// returns array of dir, cell pairs
+	allNeighbors(cell) {
+		const result = [];
+		for (const dirKey of [NORTH, EAST, SOUTH, WEST]) {
+			const n = this.findNeighbor(cell, dirKey);
+			if (n) result.push( { dir: dirKey, cell : n });
+		}
+		return result;
+	}
+
+	// find neighboring cell in given dir, not necessarily linked
+	// may return null, e.g. when at edge of map
 	findNeighbor(cell, dir) {
 		const x = cell.x;
 		const y = cell.y;
@@ -208,11 +224,6 @@ export class Grid {
 	}
 }
 
-export function pickOne(list) {
-	const idx = Math.floor(Math.random() * list.length);
-	return list[idx];
-}
-
 export function binaryTree(grid) {
 
 	grid.eachCell(cell => {
@@ -226,15 +237,74 @@ export function binaryTree(grid) {
 		if (east) neighbors.push({ dir: EAST, cell: east });
 		
 		const item = pickOne(neighbors);
+		if (item) { 
+			// add door sometimes...
+			const linkType  = Math.random() > 0.95 ? 2 : 1;	
+			cell.link(item.cell, item.dir, true, linkType); 
+		}
 
-		// add door sometimes...
-		const linkType  = Math.random() > 0.95 ? 2 : 1;
-		if (item) { cell.link(item.cell, item.dir, true, linkType); }
-
+		// add key sometimes
 		if (Math.random() > 0.95) {
 			cell.object = 2;
 		}
-
 	});
 	
+}
+
+export function randomNumber(range) {
+	return Math.floor(Math.random() * range);
+}
+
+export function pickOne(list) {
+	const idx = randomNumber(list.length);
+	return list[idx];
+}
+
+export function recursiveBackTracker(grid) {
+	const stack = [];
+	const start = grid.get(randomNumber(grid.w), randomNumber(grid.h));
+	stack.push(start);
+
+	const keyState = {
+		2: 0,
+		3: 0,
+		4: 0
+	};
+
+	while (stack.length > 0) {
+		const current = stack[stack.length - 1];
+		const unvisitedNeighbors = grid.allNeighbors(current).filter(item => {
+			return (Object.entries(item.cell.links).length === 0);
+		});
+
+		// add object sometimes.
+		if (Math.random() > 0.98) {
+			const key = randomNumber(3) + 2;
+			keyState[key] += 1;
+			current.object = key;
+			console.log({keyState});
+		}
+
+		if (unvisitedNeighbors.length === 0) {
+			stack.pop();
+		}
+		else {
+			const item = pickOne(unvisitedNeighbors);
+			
+			// add door sometimes...
+			
+			let linkType = 1; // base
+			if (Math.random() > 0.75) {
+				const availableKey = pickOne(Object.keys(keyState).filter(key => keyState[key] > 0));
+				if (availableKey) {
+					linkType = availableKey;
+					keyState[availableKey] -= 1;
+				}
+			}
+
+			current.link(item.cell, item.dir, true, linkType);
+			stack.push(item.cell); 
+		}
+
+	}
 }
