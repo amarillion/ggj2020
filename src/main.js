@@ -67,6 +67,7 @@ class GameState {
 		this.load.image(TILES_IMG, "assets/sprites.png");
 		this.load.spritesheet(SPRITESHEET, "assets/sprites.png", TILE_WIDTH, TILE_HEIGHT, NUM_TILES);
 		this.load.tilemap("level", "assets/placeholder-level.json", null, Phaser.Tilemap.TILED_JSON);
+		this.load.audio('mainSoundtrack', ['assets/music.mp3', 'assets/music.ogg']);
 		this.cursors = this.game.input.keyboard.createCursorKeys();
 	}
 
@@ -77,6 +78,9 @@ class GameState {
 
 		this.game.physics.startSystem(Phaser.Physics.ARCADE);
 		this.game.physics.arcade.gravity.y = 0;
+
+		this.music = this.game.add.audio('mainSoundtrack');
+		this.music.play();
 
 		this.currentLevel = 0;
 		this.levelConfig = levelData[this.currentLevel]; 
