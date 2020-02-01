@@ -7,9 +7,8 @@ import 'expose-loader?PIXI!phaser-ce/build/custom/pixi.js';
 import 'expose-loader?p2!phaser-ce/build/custom/p2.js';
 import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js';
 import { Grid, recursiveBackTracker, addDoors } from './maze';
-import { GAME_SCALE, WALL_TILE, START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W } from './constants';
+import { GAME_SCALE, WALL_TILE, KEY_TILE, START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W } from './constants';
 import MenuState from './MenuState';
-
 class Game extends Phaser.Game {
 	
 	constructor() {
@@ -28,13 +27,15 @@ class Game extends Phaser.Game {
 const TILES_IMG = "sprites1";
 const SPRITESHEET = "sprites2";
 
-const UNIT = 64; // size of the square tiles in pixels
+const UNIT = 64 * GAME_SCALE; // size of the square tiles in pixels
 
 class GameState {
 	
 	// called once per session
 	constructor() {
 		console.log("GameState.constructor");
+
+		this.collectedKeys = {};
 	}
 
 	preload() {		
@@ -71,6 +72,8 @@ class GameState {
 		//this.game.world.scale.setTo(3.0);
 		this.l1.resizeWorld();
 
+		this.keys = this.game.add.group();
+
 		let playerTile;
 		let goal;
 
@@ -94,13 +97,28 @@ class GameState {
 						break;
 					case ENEMY_TILE: // enemy
 						break;
+					case KEY_TILE: // key
+						//create object
+						let newKey = this.keys.create(tile.worldX/GAME_SCALE + BODY_W/2, tile.worldY/GAME_SCALE + BODY_H/2, SPRITESHEET, KEY_TILE);
+						newKey.data = { 'key_id' : KEY_TILE};
+						this.game.physics.arcade.enable(newKey, Phaser.Physics.ARCADE);
+						newKey.anchor.set(0.5);
+						newKey.body.setSize(BODY_W, BODY_H, BODY_LEFT, BODY_TOP);
+						this.game.physics.arcade.enable(newKey, Phaser.Physics.ARCADE);
+						map.putTile(EMPTY_TILE, x, y);
+						break;
 					default:
 						break;
 				}
 			}
 		}
 
+		console.log(this.keys);
+
+		this.keys.scale.setTo(GAME_SCALE);
 		this.map.setCollision(WALL_TILE, true, this.l1);
+
+		// this.map.createFromObjects('Tile Layer 1', KEY_TILE, SPRITESHEET, KEY_TILE, true, false, this.keys);
 		
 		this.player = this.game.add.sprite(100, 100, SPRITESHEET, START_TILE);
 		this.player.animations.add('idle', [ 0x00, 0x01, 0x02 ], 3, true);
@@ -114,6 +132,7 @@ class GameState {
 
 		this.game.physics.arcade.enable(this.player, Phaser.Physics.ARCADE);
 		this.game.physics.arcade.enable(this.l1, Phaser.Physics.ARCADE);
+		//this.game.physics.arcade.enable(this.keys, Phaser.Physics.ARCADE);
 
 		this.moveMonsters();
 
@@ -160,6 +179,7 @@ class GameState {
 
 		this.game.physics.arcade.collide(this.player, this.l1, this.playerHitsWall, null, this);
 		this.game.physics.arcade.collide(this.monsters, this.l1, this.monsterHitsWall, null, this);
+		this.game.physics.arcade.overlap(this.player, this.keys, this.playerFindsKey, null, this);
 	}
 
 	initMonsters() {
@@ -181,16 +201,16 @@ class GameState {
 			let randomNumber = Math.floor((Math.random() * 4) + 1);
 			switch (randomNumber) {
 				case 1:
-					newMonster.body.velocity.x = UNIT;
+					newMonster.body.velocity.x = UNIT/2;
 					break;
 				case 2:
-					newMonster.body.velocity.x = -UNIT;
+					newMonster.body.velocity.x = -UNIT/2;
 					break;
 				case 3:
-					newMonster.body.velocity.y = UNIT;
+					newMonster.body.velocity.y = UNIT/2;
 					break;
 				case 4:
-					newMonster.body.velocity.y = -UNIT;
+					newMonster.body.velocity.y = -UNIT/2;
 					break;
 				default:
 					break;
@@ -223,6 +243,13 @@ class GameState {
 	playerHitsWall(player, wall) {
 		player.body.velocity.x = 0;
 		player.body.velocity.y = 0;
+	}
+
+	playerFindsKey(player, key) {
+		let keyId = key.data.key_id;
+		this.collectedKeys[keyId] = (this.collectedKeys[keyId]+1) || 1 ;
+		key.kill();
+		console.log("Collected the key with ID: " + keyId);
 	}
 
 	monsterHitsWall(monster, wall) {
