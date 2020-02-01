@@ -26,6 +26,10 @@ export const DOOR_TILE = 0x20; // closed
 export const DOOR2_TILE = 0x30; // closed
 export const DOOR3_TILE = 0x40; // closed
 
+export const DOOR_OPEN_TILE = 0x21; // open
+export const DOOR2_OPEN_TILE = 0x31; // open
+export const DOOR3_OPEN_TILE = 0x41; // open
+
 export const KEY_TILE = 0x22;
 export const KEY2_TILE = 0x32;
 export const KEY3_TILE = 0x42;

@@ -9,7 +9,9 @@ import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js'
 import { Grid, recursiveBackTracker, addDoors } from './maze';
 import { 
 	GAME_SCALE, WALL_TILE, 
-	KEY_TILE, KEY2_TILE, KEY3_TILE, 
+	KEY_TILE, KEY2_TILE, KEY3_TILE,
+	DOOR_TILE, DOOR2_TILE, DOOR3_TILE,
+	DOOR_OPEN_TILE, DOOR2_OPEN_TILE, DOOR3_OPEN_TILE,
 	START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, 
 	TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W 
 } from './constants';
@@ -46,14 +48,17 @@ class GameState {
 
 		this.collectedKeys = {};
 		this.doorsAndKeys = {
-			DOOR_TILE: {
-				'key': KEY_TILE
+			[DOOR_TILE]: {
+				'openTile': DOOR_OPEN_TILE,
+				'requiredKey': KEY_TILE
 			},
-			DOOR2_TILE: {
-				'key': KEY2_TILE
+			[DOOR2_TILE]: {
+				'openTile': DOOR2_OPEN_TILE,
+				'requiredKey': KEY2_TILE
 			},
-			DOOR3_TILE: {
-				'key': KEY3_TILE
+			[DOOR3_TILE]: {
+				'openTile': DOOR3_OPEN_TILE,
+				'requiredKey': KEY3_TILE
 			}
 		};
 	}
@@ -119,6 +124,13 @@ class GameState {
 						break;
 					case EMPTY_TILE: // open area
 						break;
+					case DOOR_TILE: // door closed
+					case DOOR2_TILE: // door closed
+					case DOOR3_TILE: // door closed
+						tile.properties['is_closed_door'] = true;
+						tile.properties['x'] = x;
+						tile.properties['y'] = y;
+						break;
 					case GOAL_TILE: // goal
 						this.goal = tile;
 						break;
@@ -142,10 +154,11 @@ class GameState {
 			}
 		}
 
-		console.log(this.keys);
-
 		this.keys.scale.setTo(GAME_SCALE);
 		this.map.setCollision(WALL_TILE, true, this.l1);
+		this.map.setCollision(DOOR_TILE, true, this.l1);
+		this.map.setCollision(DOOR2_TILE, true, this.l1);
+		this.map.setCollision(DOOR3_TILE, true, this.l1);
 		this.map.setCollision(GOAL_TILE, true, this.l1);
 
 		// this.map.createFromObjects('Tile Layer 1', KEY_TILE, SPRITESHEET, KEY_TILE, true, false, this.keys);
@@ -239,7 +252,7 @@ class GameState {
 				case 1:
 					newMonster.body.velocity.x = UNIT/5;
 					break;
-				case 2:
+				case 2:DOOR_TILE
 					newMonster.body.velocity.x = -UNIT/5;
 					break;
 				case 3:
@@ -277,11 +290,35 @@ class GameState {
 	}
 
 	playerHitsWall(player, wall) {
+		//console.log(wall);
 		player.body.velocity.x = 0;
 		player.body.velocity.y = 0;
 
 		if (wall == this.goal) {
 			this.nextLevel();
+		} else if ( wall.properties['is_closed_door'] ) {
+			let index = wall.index;
+			console.log("Index is: " + index);
+			console.log(this.doorsAndKeys);
+			if ( index in this.doorsAndKeys ) {
+				let requiredKey = this.doorsAndKeys[index]['requiredKey'];
+				console.log("Required Key: " + requiredKey);
+				if ( requiredKey && this.collectedKeys[requiredKey] ) {
+					this.collectedKeys[requiredKey] -= 1;
+					wall.properties['is_closed_door'] = false;
+					let openTile = this.doorsAndKeys[index]['openTile'];
+					let x = wall.x;
+					let y = wall.y;
+					console.log({'x': x, 'y': y});
+					this.map.putTile(openTile, x, y);
+					console.log("Unlocked!" + openTile);
+				}
+
+			}
+			else {
+				console.log("You don't have key dude.");
+			}
+
 		}
 	}
 
