@@ -26,7 +26,7 @@ class Game extends Phaser.Game {
 const TILES_IMG = "sprites1";
 const SPRITESHEET = "sprites2";
 
-const UNIT = 160; // size of the square tiles in pixels
+const UNIT = 32; // size of the square tiles in pixels
 
 class GameState {
 	
@@ -97,9 +97,15 @@ class GameState {
 		this.map.setCollision(0, true, this.l1);
 		
 		this.player = this.game.add.sprite(100, 100, SPRITESHEET, 3);
-		
+		this.monsters = this.game.add.group();
+		this.initMonsters();
+
+		this.game.physics.arcade.enable(this.player, Phaser.Physics.ARCADE);
+		this.game.physics.arcade.enable(this.l1, Phaser.Physics.ARCADE);
+
+		this.moveMonsters();
+
 		this.player.anchor.set(0.5);
-		this.game.physics.arcade.enable([this.player, this.l1], Phaser.Physics.ARCADE);
 		
 		//  This adjusts the collision body size.
 		this.player.body.setSize(8, 8, 0, 0);
@@ -115,7 +121,6 @@ class GameState {
 	
 		/* const t = */ // this.add.text(this.world.centerX - 300, 0, text, style);	
 	}
-
 
 	update() {
 		this.player.body.velocity.x = 0;
@@ -141,13 +146,71 @@ class GameState {
 		}
 
 
-		this.game.physics.arcade.collide(this.player, this.l1, this.collisionCallback, null, this);
-
+		this.game.physics.arcade.collide(this.player, this.l1, this.playerHitsWall, null, this);
+		this.game.physics.arcade.collide(this.monsters, this.l1, this.monsterHitsWall, null, this);
 	}
 
-	collisionCallback(obj1, obj2) {
-		this.player.body.velocity.x = 0;
-		this.player.body.velocity.y = 0;
+	initMonsters() {
+		let count = 5;
+		for (let i = 0; i < count; i++ ) {
+			//let newMonster = this.game.add.sprite(100, 110, SPRITESHEET, 5);
+			let newMonster = this.monsters.create(100, 110, SPRITESHEET, 5);
+			this.game.physics.arcade.enable(newMonster, Phaser.Physics.ARCADE);
+
+			newMonster.anchor.set(0.5);
+			//  This adjusts the collision body size.
+			newMonster.body.setSize(8, 8, 0, 0);
+			newMonster.body.bounce.set(1);
+			let randomNumber = Math.floor((Math.random() * 4) + 1);
+			switch (randomNumber) {
+				case 1:
+					newMonster.body.velocity.x = UNIT;
+					break;
+				case 2:
+					newMonster.body.velocity.x = -UNIT;
+					break;
+				case 3:
+					newMonster.body.velocity.y = UNIT;
+					break;
+				case 4:
+					newMonster.body.velocity.y = -UNIT;
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	moveMonsters() {
+		this.monsters.forEach(function (monster) {
+			let randomNumber = Math.floor((Math.random() * 4) + 1);
+			switch (randomNumber) {
+				case 1:
+					monster.body.velocity.x = UNIT/2;
+					break;
+				case 2:
+					monster.body.velocity.x = -UNIT/2;
+					break;
+				case 3:
+					monster.body.velocity.y = UNIT/2;
+					break;
+				case 4:
+					monster.body.velocity.y = -UNIT/2;
+					break;
+				default:
+					break;
+			}
+		});
+	}
+
+	playerHitsWall(player, wall) {
+		player.body.velocity.x = 0;
+		player.body.velocity.y = 0;
+	}
+
+	monsterHitsWall(monster, wall) {
+		//monster.body.velocity.x = -monster.body.velocity.x;
+		//monster.body.velocity.y = -monster.body.velocity.y;
 	}
 
 	render() {
