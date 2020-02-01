@@ -25,15 +25,24 @@ export class Cell {
 		this.x = x;
 		this.y = y;
 		this.links = {};
+		this.linkTypes = {};
+		this.object = null;
 	}
 
-	link(other, dir, bidi=true) {
+	link(other, dir, bidi=true, linkType = 1) {
 		console.log({other, dir});
 		if (dir in this.links) {
 			console.log("WARNING: creating link that already exists");
 		}
 		this.links[dir] = other;
-		if (bidi) { other.link(this, reverse[dir], false); }
+		this.linkTypes[dir] = linkType;
+		if (bidi) { other.link(this, reverse[dir], false, linkType); }
+	}
+
+	// 0 means: no link
+	// 1 or higher means: some kind of door
+	linkType(dir) {
+		return dir in this.links ? this.linkTypes[dir] : 0; 
 	}
 
 	linked(dir) {
@@ -132,6 +141,8 @@ export class Grid {
 		const SCALE = 5;
 
 		const WALL_TILE = 0;
+		const DOOR_TILE = 5;
+		const KEY_TILE = 4;
 		const EMPTY_TILE = 6;
 		const GOAL_TILE = 2;
 		const START_TILE = 1;
@@ -167,17 +178,27 @@ export class Grid {
 			const xx = cell.x * SCALE;
 			const yy = cell.y * SCALE;
 			
+			if (cell.object) {
+				map.putTile(KEY_TILE, xx + 3, yy + 3);
+			}
+
 			// draw EAST
-			if (!cell.linked(EAST)) {
+			if (cell.linkType(EAST) !== 1) {
 				for (let d = 0; d < SCALE + 1; ++d) {
 					map.putTile(WALL_TILE, xx + SCALE, yy + d);
+				}
+				if (cell.linkType(EAST) > 1) {
+					map.putTile(DOOR_TILE, xx + SCALE, yy + 3);
 				}
 			}
 
 			// draw SOUTH
-			if (!cell.linked(SOUTH)) {
+			if (cell.linkType(SOUTH) !== 1) {
 				for (let d = 0; d < SCALE + 1; ++d) {
 					map.putTile(WALL_TILE, xx + d, yy + SCALE);
+				}
+				if (cell.linkType(SOUTH) > 1) {
+					map.putTile(DOOR_TILE, xx + 3, yy + SCALE);
 				}
 			}
 			
@@ -205,7 +226,14 @@ export function binaryTree(grid) {
 		if (east) neighbors.push({ dir: EAST, cell: east });
 		
 		const item = pickOne(neighbors);
-		if (item) { cell.link(item.cell, item.dir); }
+
+		// add door sometimes...
+		const linkType  = Math.random() > 0.95 ? 2 : 1;
+		if (item) { cell.link(item.cell, item.dir, true, linkType); }
+
+		if (Math.random() > 0.95) {
+			cell.object = 2;
+		}
 
 	});
 	
