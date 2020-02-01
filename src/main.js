@@ -7,7 +7,7 @@ import 'expose-loader?PIXI!phaser-ce/build/custom/pixi.js';
 import 'expose-loader?p2!phaser-ce/build/custom/p2.js';
 import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js';
 import { Grid, recursiveBackTracker, addDoors } from './maze';
-import { WALL_TILE, START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W } from './constants';
+import { GAME_SCALE, WALL_TILE, START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W } from './constants';
 import MenuState from './MenuState';
 
 class Game extends Phaser.Game {
@@ -66,7 +66,7 @@ class GameState {
 
 		// l1.setScale works. l1.scale.setTo(2) disables collision!
 		// see https://github.com/photonstorm/phaser/issues/2305
-		this.l1.setScale(2);
+		this.l1.setScale(GAME_SCALE);
 
 		//this.game.world.scale.setTo(3.0);
 		this.l1.resizeWorld();
@@ -106,10 +106,10 @@ class GameState {
 		this.player.animations.add('idle', [ 0x00, 0x01, 0x02 ], 3, true);
 		this.player.animations.add('walk', [ 0x03, 0x04 ], 2, true);
 		this.player.animations.play('walk');
-		this.player.scale.setTo(2);
+		this.player.scale.setTo(GAME_SCALE);
 
 		this.monsters = this.game.add.group();
-		this.monsters.scale.setTo(2);
+		this.monsters.scale.setTo(GAME_SCALE);
 		this.initMonsters();
 
 		this.game.physics.arcade.enable(this.player, Phaser.Physics.ARCADE);

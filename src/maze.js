@@ -156,7 +156,8 @@ export class Grid {
 	}
 
 	convertToMap(map) {
-		const SCALE = 5;
+		const SCALE = 4;
+		const MID = 2;
 
 		const mapw = this.w * SCALE + 1;
 		const maph = this.h * SCALE + 1;
@@ -182,15 +183,15 @@ export class Grid {
 			map.putTile(WALL_TILE, mapw-1, y);
 		}
 
-		map.putTile(START_TILE, mapw - 4, 2);
-		map.putTile(GOAL_TILE, 2, maph - 4);
+		map.putTile(START_TILE, mapw - 1 - MID, MID);
+		map.putTile(GOAL_TILE, MID, maph - 1 - MID);
 	
 		this.eachCell(cell => {
 			const xx = cell.x * SCALE;
 			const yy = cell.y * SCALE;
 			
 			if (cell.object) {
-				map.putTile(KEY_TILE, xx + 3, yy + 3);
+				map.putTile(KEY_TILE, xx + MID, yy + MID);
 			}
 
 			// draw EAST
@@ -199,7 +200,7 @@ export class Grid {
 					map.putTile(WALL_TILE, xx + SCALE, yy + d);
 				}
 				if (cell.linkType(EAST) > 1) {
-					map.putTile(DOOR_TILE, xx + SCALE, yy + 3);
+					map.putTile(DOOR_TILE, xx + SCALE, yy + MID);
 				}
 			}
 
@@ -209,7 +210,7 @@ export class Grid {
 					map.putTile(WALL_TILE, xx + d, yy + SCALE);
 				}
 				if (cell.linkType(SOUTH) > 1) {
-					map.putTile(DOOR_TILE, xx + 3, yy + SCALE);
+					map.putTile(DOOR_TILE, xx + MID, yy + SCALE);
 				}
 			}
 			
