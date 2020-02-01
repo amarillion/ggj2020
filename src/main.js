@@ -46,6 +46,8 @@ class GameState {
 	constructor() {
 		console.log("GameState.constructor");
 
+		this.frustrationScore = 0;
+		this.frustrationCoeff = 1;
 		this.collectedKeys = {};
 		this.doorsAndKeys = {
 			[DOOR_TILE]: {
