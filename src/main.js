@@ -7,7 +7,7 @@ import 'expose-loader?PIXI!phaser-ce/build/custom/pixi.js';
 import 'expose-loader?p2!phaser-ce/build/custom/p2.js';
 import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js';
 import { Grid, recursiveBackTracker, addDoors } from './maze';
-import { WALL_TILE, START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE } from './constants';
+import { WALL_TILE, START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W } from './constants';
 
 class Game extends Phaser.Game {
 	
@@ -27,7 +27,7 @@ class Game extends Phaser.Game {
 const TILES_IMG = "sprites1";
 const SPRITESHEET = "sprites2";
 
-const UNIT = 32; // size of the square tiles in pixels
+const UNIT = 64; // size of the square tiles in pixels
 
 class GameState {
 	
@@ -37,8 +37,8 @@ class GameState {
 	}
 
 	preload() {		
-		this.load.image(TILES_IMG, "assets/placeholder-sprites.png");
-		this.load.spritesheet(SPRITESHEET, "assets/placeholder-sprites.png", 8, 8, 63);
+		this.load.image(TILES_IMG, "assets/sprites.png");
+		this.load.spritesheet(SPRITESHEET, "assets/sprites.png", TILE_WIDTH, TILE_HEIGHT, NUM_TILES);
 		this.load.tilemap("level", "assets/placeholder-level.json", null, Phaser.Tilemap.TILED_JSON);
 		this.cursors = this.game.input.keyboard.createCursorKeys();
 	}
@@ -57,7 +57,7 @@ class GameState {
 	
 		// create a tilemap
 		this.map = this.game.add.tilemap();
-		this.map.setTileSize(8, 8);
+		this.map.setTileSize(TILE_WIDTH, TILE_HEIGHT);
 		this.map.addTilesetImage(TILES_IMG);
 		const map = this.map;
 
@@ -96,9 +96,9 @@ class GameState {
 		}
 
 
-		this.map.setCollision(0, true, this.l1);
+		this.map.setCollision(WALL_TILE, true, this.l1);
 		
-		this.player = this.game.add.sprite(100, 100, SPRITESHEET, 3);
+		this.player = this.game.add.sprite(100, 100, SPRITESHEET, START_TILE);
 		this.monsters = this.game.add.group();
 		this.initMonsters();
 
@@ -110,7 +110,7 @@ class GameState {
 		this.player.anchor.set(0.5);
 		
 		//  This adjusts the collision body size.
-		this.player.body.setSize(8, 8, 0, 0);
+		this.player.body.setSize(BODY_W, BODY_H, BODY_LEFT, BODY_TOP);
 
 		this.game.camera.follow(this.player);
 
@@ -156,12 +156,12 @@ class GameState {
 		let count = 5;
 		for (let i = 0; i < count; i++ ) {
 			//let newMonster = this.game.add.sprite(100, 110, SPRITESHEET, 5);
-			let newMonster = this.monsters.create(100, 110, SPRITESHEET, 5);
+			let newMonster = this.monsters.create(100, 110, SPRITESHEET, ENEMY_TILE);
 			this.game.physics.arcade.enable(newMonster, Phaser.Physics.ARCADE);
 
 			newMonster.anchor.set(0.5);
 			//  This adjusts the collision body size.
-			newMonster.body.setSize(8, 8, 0, 0);
+			newMonster.body.setSize(BODY_W, BODY_H, BODY_LEFT, BODY_TOP);
 			newMonster.body.bounce.set(1);
 			let randomNumber = Math.floor((Math.random() * 4) + 1);
 			switch (randomNumber) {
