@@ -7,7 +7,7 @@ import 'expose-loader?PIXI!phaser-ce/build/custom/pixi.js';
 import 'expose-loader?p2!phaser-ce/build/custom/p2.js';
 import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js';
 import { Grid, recursiveBackTracker, addDoors } from './maze';
-import { GAME_SCALE, WALL_TILE, KEY_TILE, START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W } from './constants';
+import { GAME_SCALE, WALL_TILE, KEY_TILE, KEY2_TILE, KEY3_TILE, START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W } from './constants';
 import MenuState from './MenuState';
 class Game extends Phaser.Game {
 	
@@ -97,10 +97,12 @@ class GameState {
 						break;
 					case ENEMY_TILE: // enemy
 						break;
-					case KEY_TILE: // key
+					case KEY_TILE: // key1
+					case KEY2_TILE: // key2
+					case KEY3_TILE: // key3
 						//create object
-						let newKey = this.keys.create(tile.worldX/GAME_SCALE + BODY_W/2, tile.worldY/GAME_SCALE + BODY_H/2, SPRITESHEET, KEY_TILE);
-						newKey.data = { 'key_id' : KEY_TILE};
+						let newKey = this.keys.create(tile.worldX/GAME_SCALE + BODY_W/2, tile.worldY/GAME_SCALE + BODY_H/2, SPRITESHEET, index);
+						newKey.data = { 'key_id' : index};
 						this.game.physics.arcade.enable(newKey, Phaser.Physics.ARCADE);
 						newKey.anchor.set(0.5);
 						newKey.body.setSize(BODY_W, BODY_H, BODY_LEFT, BODY_TOP);
