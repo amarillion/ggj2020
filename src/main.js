@@ -6,7 +6,7 @@
 import 'expose-loader?PIXI!phaser-ce/build/custom/pixi.js';
 import 'expose-loader?p2!phaser-ce/build/custom/p2.js';
 import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js';
-import { Grid, binaryTree, recursiveBackTracker } from './maze';
+import { Grid, binaryTree, recursiveBackTracker, addDoors } from './maze';
 
 class Game extends Phaser.Game {
 	
@@ -52,6 +52,7 @@ class GameState {
 
 		const grid = new Grid(10, 10);
 		recursiveBackTracker(grid);
+		addDoors(grid);
 	
 		// create a tilemap
 		this.map = this.game.add.tilemap();

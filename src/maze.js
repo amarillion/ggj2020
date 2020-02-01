@@ -54,7 +54,11 @@ export class Cell {
 	}
 
 	listNeighbors() {
-		return Object.entries(this.links);
+		const result = [];
+		for (const [k, v] of Object.entries(this.links)) {
+			result.push({ dir: k, cell : v });
+		}
+		return result;
 	}
 }
 
@@ -265,6 +269,33 @@ export function recursiveBackTracker(grid) {
 	const start = grid.get(randomNumber(grid.w), randomNumber(grid.h));
 	stack.push(start);
 
+	while (stack.length > 0) {
+		const current = stack[stack.length - 1];
+		const unvisitedNeighbors = grid.allNeighbors(current).filter(item => {
+			return (Object.entries(item.cell.links).length === 0);
+		});
+
+		if (unvisitedNeighbors.length === 0) {
+			stack.pop();
+		}
+		else {
+			const item = pickOne(unvisitedNeighbors);
+			
+			let linkType = 1; // base
+			current.link(item.cell, item.dir, true, linkType);
+			stack.push(item.cell); 
+		}
+	}
+}
+
+export function addDoors(grid) {
+	const stack = [];
+	const visited = new Set();
+
+	const start = grid.get(randomNumber(grid.w), randomNumber(grid.h));
+	stack.push(start);
+	visited.add(start);
+
 	const keyState = {
 		2: 0,
 		3: 0,
@@ -273,10 +304,7 @@ export function recursiveBackTracker(grid) {
 
 	while (stack.length > 0) {
 		const current = stack[stack.length - 1];
-		const unvisitedNeighbors = grid.allNeighbors(current).filter(item => {
-			return (Object.entries(item.cell.links).length === 0);
-		});
-
+		
 		// add object sometimes.
 		if (Math.random() > 0.98) {
 			const key = randomNumber(3) + 2;
@@ -284,6 +312,9 @@ export function recursiveBackTracker(grid) {
 			current.object = key;
 			console.log({keyState});
 		}
+
+		const unvisitedNeighbors = current.listNeighbors().
+			filter(item => !visited.has(item.cell));
 
 		if (unvisitedNeighbors.length === 0) {
 			stack.pop();
@@ -299,12 +330,15 @@ export function recursiveBackTracker(grid) {
 				if (availableKey) {
 					linkType = availableKey;
 					keyState[availableKey] -= 1;
+
+					assert(current.linkType(item.dir)) == 1;
+					current.linkTypes[item.dir] = linkType;
 				}
 			}
 
-			current.link(item.cell, item.dir, true, linkType);
-			stack.push(item.cell); 
+			// current.link(item.cell, item.dir, true, linkType);
+			stack.push(item.cell);
+			visited.add(item.cell);
 		}
-
 	}
 }
