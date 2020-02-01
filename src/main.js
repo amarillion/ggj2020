@@ -181,8 +181,6 @@ class GameState {
 		this.game.physics.arcade.enable(this.l1, Phaser.Physics.ARCADE);
 		//this.game.physics.arcade.enable(this.keys, Phaser.Physics.ARCADE);
 
-		this.moveMonsters();
-
 		this.player.anchor.set(0.5);
 		
 		//  This adjusts the collision body size.
@@ -227,6 +225,7 @@ class GameState {
 
 
 		this.game.physics.arcade.collide(this.player, this.l1, this.playerHitsWall, null, this);
+		this.game.physics.arcade.collide(this.player, this.monsters, this.playerHitsMonster, null, this);
 		this.game.physics.arcade.collide(this.monsters, this.l1, this.monsterHitsWall, null, this);
 		this.game.physics.arcade.overlap(this.player, this.keys, this.playerFindsKey, null, this);
 	}
@@ -239,6 +238,7 @@ class GameState {
 			newMonster.animations.add('idle', [ 0x10, 0x11, 0x12 ], 3, true);
 			newMonster.animations.add('walk', [ 0x13, 0x14 ], 2, true);
 			newMonster.animations.play('walk');
+			newMonster.data['isChangingDirection'] = false;
 		
 			
 			this.game.physics.arcade.enable(newMonster, Phaser.Physics.ARCADE);
@@ -250,43 +250,25 @@ class GameState {
 			let randomNumber = Math.floor((Math.random() * 4) + 1);
 			switch (randomNumber) {
 				case 1:
-					newMonster.body.velocity.x = UNIT/5;
+					newMonster.body.velocity.x = UNIT/10;
+					newMonster.body.velocity.y = UNIT/10;
 					break;
-				case 2:DOOR_TILE
-					newMonster.body.velocity.x = -UNIT/5;
+				case 2:
+					newMonster.body.velocity.x = -UNIT/10;
+					newMonster.body.velocity.y = UNIT/10;
 					break;
 				case 3:
-					newMonster.body.velocity.y = UNIT/5;
+					newMonster.body.velocity.x = UNIT/10;
+					newMonster.body.velocity.y = -UNIT/10;
 					break;
 				case 4:
-					newMonster.body.velocity.y = -UNIT/5;
+					newMonster.body.velocity.x = -UNIT/10;
+					newMonster.body.velocity.y = -UNIT/10;
 					break;
 				default:
 					break;
 			}
 		}
-	}
-
-	moveMonsters() {
-		this.monsters.forEach(function (monster) {
-			let randomNumber = Math.floor((Math.random() * 4) + 1);
-			switch (randomNumber) {
-				case 1:
-					monster.body.velocity.x = UNIT/5;
-					break;
-				case 2:
-					monster.body.velocity.x = -UNIT/5;
-					break;
-				case 3:
-					monster.body.velocity.y = UNIT/5;
-					break;
-				case 4:
-					monster.body.velocity.y = -UNIT/5;
-					break;
-				default:
-					break;
-			}
-		});
 	}
 
 	playerHitsWall(player, wall) {
@@ -329,9 +311,31 @@ class GameState {
 		console.log("Collected the key with ID: " + keyId);
 	}
 
+	playerHitsMonster(player, monster) {
+		
+		console.log("MONSTER BITES YOU");
+	}
+
 	monsterHitsWall(monster, wall) {
-		//monster.body.velocity.x = -monster.body.velocity.x;
-		//monster.body.velocity.y = -monster.body.velocity.y;
+		if ( monster.data['isChangingDirection'] == false ) {
+			monster.data['isChangingDirection'] = true;
+			this.game.time.events.add(Phaser.Timer.SECOND/4, function() {
+
+				monster.data['isChangingDirection'] = false;
+				if ( monster.body.velocity.x ) {
+					let direction = Math.round(Math.random()) ? 1 : -1;
+					monster.body.velocity.y = monster.body.velocity.x * direction;
+					direction = Math.round(Math.random()) ? 1 : -1;
+					monster.body.velocity.x = monster.body.velocity.x * direction;
+				}
+				if ( monster.body.velocity.y ) {
+					let direction = Math.round(Math.random()) ? 1 : -1;
+					monster.body.velocity.x = monster.body.velocity.y * direction;
+					direction = Math.round(Math.random()) ? 1 : -1;
+					monster.body.velocity.y = monster.body.velocity.y * direction;
+				}
+			}, this);
+		}
 	}
 
 	render() {
