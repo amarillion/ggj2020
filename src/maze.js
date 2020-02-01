@@ -31,6 +31,8 @@ export class Cell {
 		this.links = {};
 		this.linkTypes = {};
 		this.object = null;
+		this.playerStart = false;
+		this.endGoal = false;
 	}
 
 	link(other, dir, bidi=true, linkType = 1) {
@@ -188,9 +190,6 @@ export class Grid {
 			map.putTile(WALL_TILE, 0, y);
 			map.putTile(WALL_TILE, mapw-1, y);
 		}
-
-		map.putTile(START_TILE, mapw - 1 - MID, MID);
-		map.putTile(GOAL_TILE, MID, maph - 1 - MID);
 	
 		this.eachCell(cell => {
 			const xx = cell.x * SCALE;
@@ -202,6 +201,16 @@ export class Grid {
 				case 3: map.putTile(KEY2_TILE, xx + MID, yy + MID); break;
 				case 4: map.putTile(KEY3_TILE, xx + MID, yy + MID); break;
 				}
+			}
+
+			if (cell.playerStart) {
+				// slightly off-set to make sure it doesn't get overwritten by keys
+				map.putTile(START_TILE, xx + MID, yy + MID - 1);
+			}
+
+			if (cell.endGoal) {
+				// slightly off-set to make sure it doesn't get overwritten by keys
+				map.putTile(GOAL_TILE, xx + MID + 1, yy + MID + 1);
 			}
 
 			// draw EAST
@@ -304,9 +313,17 @@ export function addDoors(grid) {
 	const stack = [];
 	const visited = new Set();
 
-	const start = grid.get(randomNumber(grid.w), randomNumber(grid.h));
+	const end = grid.get(grid.w-1, grid.h-1);
+	let start;
+	do {
+		start = grid.get(randomNumber(grid.w), randomNumber(grid.h));
+	} while (start === end);
+
 	stack.push(start);
 	visited.add(start);
+
+	start.playerStart = true;
+	end.endGoal = true;
 
 	const keyState = {
 		2: 0,
@@ -318,7 +335,7 @@ export function addDoors(grid) {
 		const current = stack[stack.length - 1];
 		
 		// add object sometimes.
-		if (Math.random() > 0.98) {
+		if (Math.random() > 0.90) {
 			const key = randomNumber(3) + 2;
 			keyState[key] += 1;
 			current.object = key;
@@ -337,7 +354,7 @@ export function addDoors(grid) {
 			// add door sometimes...
 			
 			let linkType = 1; // base
-			if (Math.random() > 0.75) {
+			if (Math.random() > 0.60) {
 				const availableKey = pickOne(Object.keys(keyState).filter(key => keyState[key] > 0));
 				if (availableKey) {
 					linkType = +availableKey;
