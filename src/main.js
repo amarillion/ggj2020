@@ -25,7 +25,8 @@ class Game extends Phaser.Game {
 			height: "100%",
 			// multiTexture: true,	// disabled - this causes problems with the firefox/linux/mesa combo.
 			parent: "mainDiv",
-			enableDebug: false
+			enableDebug: false,
+			antialias: false
 		};
 
 		super(cfg);
@@ -44,6 +45,17 @@ class GameState {
 		console.log("GameState.constructor");
 
 		this.collectedKeys = {};
+		this.doorsAndKeys = {
+			DOOR_TILE: {
+				'key': KEY_TILE
+			},
+			DOOR2_TILE: {
+				'key': KEY2_TILE
+			},
+			DOOR3_TILE: {
+				'key': KEY3_TILE
+			}
+		};
 	}
 
 	preload() {		
@@ -225,16 +237,16 @@ class GameState {
 			let randomNumber = Math.floor((Math.random() * 4) + 1);
 			switch (randomNumber) {
 				case 1:
-					newMonster.body.velocity.x = UNIT/2;
+					newMonster.body.velocity.x = UNIT/5;
 					break;
 				case 2:
-					newMonster.body.velocity.x = -UNIT/2;
+					newMonster.body.velocity.x = -UNIT/5;
 					break;
 				case 3:
-					newMonster.body.velocity.y = UNIT/2;
+					newMonster.body.velocity.y = UNIT/5;
 					break;
 				case 4:
-					newMonster.body.velocity.y = -UNIT/2;
+					newMonster.body.velocity.y = -UNIT/5;
 					break;
 				default:
 					break;
@@ -247,16 +259,16 @@ class GameState {
 			let randomNumber = Math.floor((Math.random() * 4) + 1);
 			switch (randomNumber) {
 				case 1:
-					monster.body.velocity.x = UNIT/2;
+					monster.body.velocity.x = UNIT/5;
 					break;
 				case 2:
-					monster.body.velocity.x = -UNIT/2;
+					monster.body.velocity.x = -UNIT/5;
 					break;
 				case 3:
-					monster.body.velocity.y = UNIT/2;
+					monster.body.velocity.y = UNIT/5;
 					break;
 				case 4:
-					monster.body.velocity.y = -UNIT/2;
+					monster.body.velocity.y = -UNIT/5;
 					break;
 				default:
 					break;
