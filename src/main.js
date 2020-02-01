@@ -194,6 +194,7 @@ class GameState {
 	}
 
 	clearLevel() {
+		this.collectedKeys = {};
 		this.game.world.removeAll();
 	}
 
