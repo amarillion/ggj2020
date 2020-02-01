@@ -6,7 +6,8 @@
 import 'expose-loader?PIXI!phaser-ce/build/custom/pixi.js';
 import 'expose-loader?p2!phaser-ce/build/custom/p2.js';
 import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js';
-import { Grid, binaryTree, recursiveBackTracker, addDoors } from './maze';
+import { Grid, recursiveBackTracker, addDoors } from './maze';
+import { WALL_TILE, START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE } from './constants';
 
 class Game extends Phaser.Game {
 	
@@ -74,19 +75,19 @@ class GameState {
 				const tile = map.getTile(x, y);
 				const index = tile && tile.index;
 				switch (index) {
-					case 0: // wall
+					case WALL_TILE: // wall
 						//tile.setCollision(true, true, true, true);
 						//console.log(tile);
 						break;
-					case 2: // player
+					case START_TILE: // player
 						playerTile = tile;
 						break;
-					case 7: // open area
+					case EMPTY_TILE: // open area
 						break;
-					case 3: // goal
+					case GOAL_TILE: // goal
 						goal = tile;
 						break;
-					case 4: // enemy
+					case ENEMY_TILE: // enemy
 						break;
 					default:
 						break;

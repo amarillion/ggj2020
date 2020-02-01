@@ -1,7 +1,5 @@
 import { assert } from "./assert";
-
-export const TILE_WIDTH = 8;
-export const TILE_HEIGHT = 8;
+import { TILE_WIDTH, TILE_HEIGHT, EMPTY_TILE, WALL_TILE, START_TILE, GOAL_TILE, KEY_TILE, DOOR_TILE } from "./constants";
 
 /*
 Generate a maze
@@ -159,13 +157,6 @@ export class Grid {
 
 	convertToMap(map) {
 		const SCALE = 5;
-
-		const WALL_TILE = 0;
-		const DOOR_TILE = 5;
-		const KEY_TILE = 4;
-		const EMPTY_TILE = 6;
-		const GOAL_TILE = 2;
-		const START_TILE = 1;
 
 		const mapw = this.w * SCALE + 1;
 		const maph = this.h * SCALE + 1;
