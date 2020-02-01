@@ -1,5 +1,11 @@
 import { assert } from "./assert";
-import { TILE_WIDTH, TILE_HEIGHT, EMPTY_TILE, WALL_TILE, START_TILE, GOAL_TILE, KEY_TILE, DOOR_TILE } from "./constants";
+import { 
+	TILE_WIDTH, TILE_HEIGHT, 
+	EMPTY_TILE, WALL_TILE, 
+	START_TILE, GOAL_TILE, 
+	KEY_TILE, KEY2_TILE, KEY3_TILE,
+	DOOR_TILE, DOOR2_TILE, DOOR3_TILE
+} from "./constants";
 
 /*
 Generate a maze
@@ -191,26 +197,40 @@ export class Grid {
 			const yy = cell.y * SCALE;
 			
 			if (cell.object) {
-				map.putTile(KEY_TILE, xx + MID, yy + MID);
+				switch (cell.object) {
+				case 2: map.putTile(KEY_TILE, xx + MID, yy + MID); break;
+				case 3: map.putTile(KEY2_TILE, xx + MID, yy + MID); break;
+				case 4: map.putTile(KEY3_TILE, xx + MID, yy + MID); break;
+				}
 			}
 
 			// draw EAST
-			if (cell.linkType(EAST) !== 1) {
+			const eastLink = cell.linkType(EAST);
+			if (eastLink !== 1) {
 				for (let d = 0; d < SCALE + 1; ++d) {
 					map.putTile(WALL_TILE, xx + SCALE, yy + d);
 				}
-				if (cell.linkType(EAST) > 1) {
-					map.putTile(DOOR_TILE, xx + SCALE, yy + MID);
+				switch (eastLink) {
+				case 0: break; // full wall 
+				case 2: map.putTile(DOOR_TILE, xx + SCALE, yy + MID); break;
+				case 3: map.putTile(DOOR2_TILE, xx + SCALE, yy + MID); break;
+				case 4: map.putTile(DOOR3_TILE, xx + SCALE, yy + MID); break;
+				default: assert(false, `Error in eastLink, got ${eastLink}`);
 				}
 			}
 
 			// draw SOUTH
-			if (cell.linkType(SOUTH) !== 1) {
+			const southLink = cell.linkType(SOUTH);
+			if (southLink !== 1) {
 				for (let d = 0; d < SCALE + 1; ++d) {
 					map.putTile(WALL_TILE, xx + d, yy + SCALE);
 				}
-				if (cell.linkType(SOUTH) > 1) {
-					map.putTile(DOOR_TILE, xx + MID, yy + SCALE);
+				switch (southLink) {
+				case 0: break; // full wall 
+				case 2: map.putTile(DOOR_TILE,  xx + MID, yy + SCALE); break;
+				case 3: map.putTile(DOOR2_TILE, xx + MID, yy + SCALE); break;
+				case 4: map.putTile(DOOR3_TILE, xx + MID, yy + SCALE); break;	
+				default: assert(false, `Error in southLink, got ${southLink}`);
 				}
 			}
 			
@@ -320,7 +340,7 @@ export function addDoors(grid) {
 			if (Math.random() > 0.75) {
 				const availableKey = pickOne(Object.keys(keyState).filter(key => keyState[key] > 0));
 				if (availableKey) {
-					linkType = availableKey;
+					linkType = +availableKey;
 					keyState[availableKey] -= 1;
 
 					assert(current.linkType(item.dir)) == 1;
