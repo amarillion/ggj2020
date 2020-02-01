@@ -8,6 +8,7 @@ import 'expose-loader?p2!phaser-ce/build/custom/p2.js';
 import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js';
 import { Grid, recursiveBackTracker, addDoors } from './maze';
 import { WALL_TILE, START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W } from './constants';
+import MenuState from './MenuState';
 
 class Game extends Phaser.Game {
 	
@@ -94,7 +95,6 @@ class GameState {
 				}
 			}
 		}
-
 
 		this.map.setCollision(WALL_TILE, true, this.l1);
 		
@@ -237,6 +237,7 @@ class GameState {
 
 window.onload = () => {
 	const game = new Game();
+	game.state.add("MenuState", MenuState);
 	game.state.add("GameState", GameState);
-	game.state.start("GameState");
+	game.state.start("MenuState");
 };
