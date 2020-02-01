@@ -103,6 +103,7 @@ class GameState {
 						break;
 					case START_TILE: // player
 						playerTile = tile;
+						map.putTile(EMPTY_TILE, x, y);
 						break;
 					case EMPTY_TILE: // open area
 						break;
@@ -137,11 +138,15 @@ class GameState {
 
 		// this.map.createFromObjects('Tile Layer 1', KEY_TILE, SPRITESHEET, KEY_TILE, true, false, this.keys);
 		
-		this.player = this.game.add.sprite(100, 100, SPRITESHEET, START_TILE);
+		this.player = this.game.add.sprite(0, 0, SPRITESHEET, START_TILE);
 		this.player.animations.add('idle', [ 0x00, 0x01, 0x02 ], 3, true);
 		this.player.animations.add('walk', [ 0x03, 0x04 ], 2, true);
 		this.player.animations.play('walk');
 		this.player.scale.setTo(GAME_SCALE);
+		this.player.position.setTo(
+			(playerTile.worldX + (GAME_SCALE*TILE_WIDTH/2)),
+			(playerTile.worldY + (GAME_SCALE*TILE_HEIGHT/2))
+		);
 
 		this.monsters = this.game.add.group();
 		this.monsters.scale.setTo(GAME_SCALE);
