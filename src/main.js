@@ -26,7 +26,7 @@ class Game extends Phaser.Game {
 const TILES_IMG = "sprites1";
 const SPRITESHEET = "sprites2";
 
-const UNIT = 320; // size of the square tiles in pixels
+const UNIT = 160; // size of the square tiles in pixels
 
 class GameState {
 	
@@ -61,7 +61,7 @@ class GameState {
 
 		this.l1 = grid.convertToMap(this.map);
 
-		this.l1.scale.setTo(3.0);
+		//this.game.world.scale.setTo(3.0);
 		this.l1.resizeWorld();
 
 		let playerTile;
@@ -73,37 +73,40 @@ class GameState {
 				const tile = map.getTile(x, y);
 				const index = tile && tile.index;
 				switch (index) {
-				case 1: // wall
-					this.map.setCollision(index, true, this.l1);
-					break;
-				case 2: // player
-					playerTile = tile;
-					break;
-				case 7: // open area
-					break;
-				case 3: // goal
-					goal = tile;
-					break;
-				case 4: // enemy
-					break;
-				default:
-					break;
+					case 0: // wall
+						//tile.setCollision(true, true, true, true);
+						//console.log(tile);
+						break;
+					case 2: // player
+						playerTile = tile;
+						break;
+					case 7: // open area
+						break;
+					case 3: // goal
+						goal = tile;
+						break;
+					case 4: // enemy
+						break;
+					default:
+						break;
 				}
 			}
 		}
+
+
+		this.map.setCollision(0, true, this.l1);
 		
-		this.player = this.game.add.sprite(100, 100, SPRITESHEET, 2);
+		this.player = this.game.add.sprite(100, 100, SPRITESHEET, 3);
 		
 		this.player.anchor.set(0.5);
-		this.game.physics.arcade.enable(this.player);
+		this.game.physics.arcade.enable([this.player, this.l1], Phaser.Physics.ARCADE);
 		
 		//  This adjusts the collision body size.
-		this.player.body.setSize(32, 32, 0, 0);
+		this.player.body.setSize(8, 8, 0, 0);
 
 		this.game.camera.follow(this.player);
 
 		this.cursors = this.game.input.keyboard.createCursorKeys();
-		//console.log ({this.player, goal});
 
 		//this.player = player;
 
@@ -118,14 +121,13 @@ class GameState {
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
 		
-		//this.game.physics.arcade.collide(this.player, this.l1);
-		// console.log ("Old position x: " + this.player.x + ", y: " + this.player.y);
+		this.game.physics.arcade.collide(this.player, this.l1, null, null, this);
 
 		if (this.cursors.left.isDown)
 		{
 			this.player.body.velocity.x = -UNIT;
 		}
-		else if (this.cursors.right.isDown)
+		if (this.cursors.right.isDown)
 		{
 			this.player.body.velocity.x = UNIT;
 		}
@@ -134,11 +136,22 @@ class GameState {
 		{
 			this.player.body.velocity.y = -UNIT;
 		}
-		else if (this.cursors.down.isDown)
+
+		if (this.cursors.down.isDown)
 		{
 			this.player.body.velocity.y = UNIT;
 		}
 
+	}
+
+	render() {
+
+		if ( this.game.enableDebug ) {
+			this.game.debug.bodyInfo(this.player, 32, 32);
+		
+			this.game.debug.body(this.player);
+		}
+	
 	}
 }
 
