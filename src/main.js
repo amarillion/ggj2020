@@ -120,8 +120,6 @@ class GameState {
 	update() {
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
-		
-		this.game.physics.arcade.collide(this.player, this.l1, null, null, this);
 
 		if (this.cursors.left.isDown)
 		{
@@ -142,6 +140,14 @@ class GameState {
 			this.player.body.velocity.y = UNIT;
 		}
 
+
+		this.game.physics.arcade.collide(this.player, this.l1, this.collisionCallback, null, this);
+
+	}
+
+	collisionCallback(obj1, obj2) {
+		this.player.body.velocity.x = 0;
+		this.player.body.velocity.y = 0;
 	}
 
 	render() {
