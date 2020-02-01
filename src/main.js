@@ -64,6 +64,10 @@ class GameState {
 
 		this.l1 = grid.convertToMap(this.map);
 
+		// l1.setScale works. l1.scale.setTo(2) disables collision!
+		// see https://github.com/photonstorm/phaser/issues/2305
+		this.l1.setScale(2);
+
 		//this.game.world.scale.setTo(3.0);
 		this.l1.resizeWorld();
 
@@ -102,8 +106,10 @@ class GameState {
 		this.player.animations.add('idle', [ 0x00, 0x01, 0x02 ], 3, true);
 		this.player.animations.add('walk', [ 0x03, 0x04 ], 2, true);
 		this.player.animations.play('walk');
+		this.player.scale.setTo(2);
 
 		this.monsters = this.game.add.group();
+		this.monsters.scale.setTo(2);
 		this.initMonsters();
 
 		this.game.physics.arcade.enable(this.player, Phaser.Physics.ARCADE);
