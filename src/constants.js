@@ -9,6 +9,7 @@ export const BODY_H = 12;
 export const BODY_LEFT = 2;
 export const BODY_TOP = 2;
 
+export const DEBUG_HIT = 5; 
 export const MONSTER_HIT = 3;
 export const TIME_HIT = 1;
 export const KEY_GAIN = 3;

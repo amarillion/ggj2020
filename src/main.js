@@ -14,7 +14,8 @@ import {
 	DOOR_OPEN_TILE_BLUE, DOOR_OPEN_TILE_YELLOW, DOOR_OPEN_TILE_RED,
 	START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, 
 	TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W,
-	MONSTER_HIT, TIME_HIT, KEY_GAIN, DOOR_GAIN, LEVEL_GAIN // frustration related
+	MONSTER_HIT, TIME_HIT, KEY_GAIN, DOOR_GAIN, LEVEL_GAIN, // frustration related
+	DEBUG_HIT
 } from './constants';
 
 import MenuState from './MenuState';
@@ -107,6 +108,9 @@ class GameState {
 		this.spaceKey.onDown.add(function() {
 			if (this.dialogs.hasActiveDialog()) {
 				this.dialogs.spacePressed();
+
+				let frustrationToAdd = this.frustrationFactor() * DEBUG_HIT;
+				this.increaseFrustrationPoint(frustrationToAdd);
 			}
 		}, this);
 
@@ -122,6 +126,7 @@ class GameState {
 		this.debugKey.onDown.add(() => {
 			if (!this.dialogs.hasActiveDialog()) {
 				this.dialogs.showDialog();
+				this.increaseFrustrationLevel();
 			}
 		});
 
