@@ -4,9 +4,9 @@ const creditsText = `Game created for Global Game Jam 2020 in 48 hours
 
 A. B. "C" Gokhan (Graphical Design)
 Ekrem "Secret weapon" Atamer (Graphical Design, Voice, Lore)
-Gökçe "SUPERDAZE" Özaydın (Music, SFX & Trailer)
-Kerem "Elvendor" Gokhan (coding)
-Martijn "Amarillion" van Iersel (coding)
+Gökçe "SUPERDAZE" Özaydın (Music, SFX, Trailer, Voice)
+Kerem "Elvendor" Gokhan (Coding)
+Martijn "Amarillion" van Iersel (Coding)
 
 Find the code on http://github.com/amarillion/ggj2020/
 `;
