@@ -3,6 +3,9 @@
 
 This project was created for the Global Game Jam 2020.
 
+Play online: http://amarillion.github.io/ggj2020
+Watch the trailer: https://www.youtube.com/watch?v=9XTpE9SMxvE
+
 ## How to build
 
 To build, check out the project from git.
