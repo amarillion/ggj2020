@@ -11,11 +11,16 @@ export class KeyManager {
 	}
 
 	reset() {
+		// door to key mapping
 		this.mapping = {
 			[RED] : RED,
 			[BLUE] : BLUE,
 			[YELLOW]: YELLOW
 		};
+	}
+
+	getKeyNeededForDoor(key) {
+		return this.mapping[key];
 	}
 
 	randomize() {
@@ -39,7 +44,7 @@ export class KeyManager {
 			result.push({
 				idx: i++,
 				id: key,
-				msg: `The ${color[key]} key opens ${color[this.mapping[key]]} doors`
+				msg: `The ${color[this.mapping[key]]} key opens ${color[key]} doors`
 			});
 		}
 		return result;

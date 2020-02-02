@@ -89,11 +89,11 @@ class GameState {
 
 		this.currentLevel = 0;
 		this.levelConfig = levelData[this.currentLevel]; 
-		this.initLevel();
-		
 		this.keyManager = new KeyManager();
 		this.dialogs = new KeyDialog(this, this.keyManager);
-
+		
+		this.initLevel();
+		
 		this.cursors = this.game.input.keyboard.createCursorKeys();
 		
 		console.log (Phaser.Keyboard);
@@ -144,6 +144,7 @@ class GameState {
 
 	initLevel() {
 		this.grid = genMazeAndAddDoors(this.levelConfig.w, this.levelConfig.h, this.levelConfig.doorFunc);
+		this.keyManager.reset();
 		this.refreshLevel();
 	}
 
@@ -371,7 +372,9 @@ class GameState {
 			console.log("Index is: " + index);
 			console.log(this.doorsAndKeys);
 			if ( index in this.doorsAndKeys ) {
-				let requiredKey = this.doorsAndKeys[index]['requiredKey'];
+				let requiredKeyBefore = this.doorsAndKeys[index]['requiredKey'];
+				let requiredKey = this.keyManager.getKeyNeededForDoor(requiredKeyBefore);
+
 				console.log("Required Key: " + requiredKey);
 				if ( requiredKey && this.collectedKeys[requiredKey] ) {
 					this.collectedKeys[requiredKey] -= 1;
