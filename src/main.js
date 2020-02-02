@@ -6,7 +6,7 @@
 import 'expose-loader?PIXI!phaser-ce/build/custom/pixi.js';
 import 'expose-loader?p2!phaser-ce/build/custom/p2.js';
 import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js';
-import { Grid, recursiveBackTracker, addDoors } from './maze';
+import { Grid, recursiveBackTracker, addDoors, genMazeAndAddDoors } from './maze';
 import { 
 	GAME_SCALE, WALL_TILE, 
 	KEY_TILE, KEY2_TILE, KEY3_TILE,
@@ -91,9 +91,7 @@ class GameState {
 	}
 
 	initLevel() {
-		const grid = new Grid(this.levelConfig.w, this.levelConfig.h);
-		recursiveBackTracker(grid);
-		addDoors(grid);
+		const grid = genMazeAndAddDoors(this.levelConfig.w, this.levelConfig.h, this.levelConfig.doorFunc);
 
 		// create a tilemap
 		this.map = this.game.add.tilemap();

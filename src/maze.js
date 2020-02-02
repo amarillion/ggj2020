@@ -35,6 +35,16 @@ export class Cell {
 		this.endGoal = false;
 	}
 
+	makeDoor(dir, doorType, bidi=true) {
+		assert(this.linkType(dir)) == 1; // must already be open link
+		assert(doorType > 1, `${doorType} must be in range 2-4`);
+		this.linkTypes[dir] = doorType;
+		if (bidi) {
+			const other = this.links[dir];
+			other.makeDoor (reverse[dir], doorType, false);
+		}
+	}
+
 	link(other, dir, bidi=true, linkType = 1) {
 		if (dir in this.links) {
 			console.log("WARNING: creating link that already exists");
@@ -66,6 +76,16 @@ export class Cell {
 		}
 		return result;
 	}
+
+	nonDoorLinks() {
+		const result = [];
+		for (const [k, v] of Object.entries(this.links)) {
+			if (this.linkTypes[k] === 1) {
+				result.push({ dir: k, cell : v });
+			}
+		}
+		return result;
+	}
 }
 
 export class Grid {
@@ -90,6 +110,10 @@ export class Grid {
 		for (const cell of this.data) {
 			f(cell);
 		}
+	}
+
+	allNodes() {
+		return this.data;
 	}
 
 	_index(x, y) {
@@ -309,7 +333,7 @@ export function recursiveBackTracker(grid) {
 	}
 }
 
-export function addDoors(grid) {
+function oldAddDoors(grid) {
 	const stack = [];
 	const visited = new Set();
 
@@ -360,8 +384,7 @@ export function addDoors(grid) {
 					linkType = +availableKey;
 					keyState[availableKey] -= 1;
 
-					assert(current.linkType(item.dir)) == 1;
-					current.linkTypes[item.dir] = linkType;
+					current.makeDoor(item.dir, linkType);
 				}
 			}
 
@@ -370,4 +393,199 @@ export function addDoors(grid) {
 			visited.add(item.cell);
 		}
 	}
+}
+
+function applyToRandomCell(cells, isValid, apply) {
+
+	let randomCell;
+	let it = 100;
+	do {
+		randomCell = pickOne(cells);
+		it--;
+		assert(it > 0, "Maximum iterations reached");
+	}
+	while (!isValid(randomCell))
+	apply(randomCell);
+}
+
+function isEmptyCell(cell) {
+	return !(cell.object || cell.playerStart || cell.endGoal);
+}
+
+function makeStart(cells) {
+	applyToRandomCell(cells,
+		isEmptyCell,
+		(c) => { c.playerStart = true; }
+	);
+}
+
+function makeGoal(cells) {
+	applyToRandomCell(cells,
+		isEmptyCell,
+		(c) => { c.endGoal = true; }
+	);
+}
+
+function dropKey(cells, key) {
+	applyToRandomCell(cells,
+		isEmptyCell,
+		(c) => { c.object = key; }
+	);
+}
+
+export function genMazeAndAddDoors(w, h, doorFunc = addDoors2) {
+	while(true) {
+		try {
+			const grid = new Grid(w, h);
+			recursiveBackTracker(grid);
+			doorFunc(grid);
+			return grid;
+		}
+		catch (e) {
+			console.log(e);
+			// try again;
+		}
+	}
+}
+
+const RED = 2;
+const YELLOW = 3;
+const BLUE = 4;
+
+export function addDoors1(grid) {
+	const allNodes = grid.allNodes();
+	const randomPivot = pickOne(allNodes);
+	const [ a, b ] = splitMaze(randomPivot, RED);
+	const [ aa, ab ] = splitMaze(a, BLUE); // aa is linked to a. ab is linked to aa
+	makeStart(expandNodes(b));
+	dropKey(expandNodes(b), RED);
+	dropKey(expandNodes(aa), BLUE);
+	makeGoal(expandNodes(ab));
+}
+
+export function addDoors2(grid) {
+	const allNodes = grid.allNodes();
+	const randomPivot = pickOne(allNodes);
+	const [ a, b ] = splitMaze(randomPivot, RED);
+	const [ aa, ab ] = splitMaze(a, BLUE); // aa is linked to a. ab is linked to aa
+	const [ ba, bb ] = splitMaze(b, YELLOW); // ba is linked to aa. bb is linked to ba
+	
+	// ab <-> aa <-> ba <-> bb
+
+	makeStart(expandNodes(ba));
+	dropKey(expandNodes(ba), YELLOW);
+	dropKey(expandNodes(bb), RED);
+	dropKey(expandNodes(aa), BLUE);
+	makeGoal(expandNodes(ab));
+}
+/*
+export function addDoors3(grid) {
+	const allNodes = grid.allNodes();
+	const randomPivot = pickOne(allNodes);
+	const [ a, b ] = splitMaze(randomPivot, RED);
+	const [ aa, ab ] = splitMaze(a, BLUE); // aa is linked to a. ab is linked to aa
+	const [ ba, bb ] = splitMaze(b, YELLOW); // ba is linked to aa. bb is linked to ba
+	const [ aba, abb ] = splitMaze(ab, RED); // aaa is linked to aa. aab is linked to aaa
+	const [ bba, bbb ] = splitMaze(bb, BLUE); // aaa is linked to aa. aab is linked to aaa
+		// abb <-> aba <-> aa <-> ba <-> bba <-> bbb
+
+	makeStart(expandNodes(ba));
+	dropKey(expandNodes(ba), YELLOW);
+	dropKey(expandNodes(ba), BLUE);
+	
+	dropKey(expandNodes(bba), RED);
+	dropKey(expandNodes(bbb), YELLOW);
+
+	dropKey(expandNodes(aa), BLUE);
+	makeGoal(expandNodes(abb));
+}
+*/
+
+// use bfs to find all freely linked nodes
+export function expandNodes(node) {
+	const visited = new Set();
+	const stack = [];
+	stack.push(node);
+	visited.add(node);
+
+	while(stack.length > 0) {
+
+		const current = stack.pop();
+		
+		// find unvisited neighbors
+		const unvisited = current.
+			nonDoorLinks().
+			filter(item => !visited.has(item.cell));
+
+		for (const item of unvisited) {
+			visited.add(item.cell);
+			stack.push(item.cell);
+		}
+	}
+
+	return [ ...visited.values() ];
+}
+
+export function reachable(src, dest) {
+
+	const visited = new Set();
+	const stack = [];
+	stack.push(src);
+	visited.add(src);
+
+	while(stack.length > 0) {
+
+		const current = stack.pop();
+		
+		// find unvisited neighbors
+		const unvisited = current.
+			nonDoorLinks().
+			filter(item => !visited.has(item.cell));
+
+		for (const item of unvisited) {
+			if (item.cell === dest) {
+				return true; // found!
+			}
+			visited.add(item.cell);
+			stack.push(item.cell);
+		}
+	}
+
+	return false; // not found
+}
+
+function splitMaze(pivot, keyType) {
+	let it = 100;
+	let valid = false;
+	do {
+		// pick a random cell
+		const expanse = expandNodes(pivot);
+		const randomCell = pickOne(expanse);
+
+		const links = randomCell.nonDoorLinks();
+		
+		if (links.length > 0) {
+			valid = true;
+			
+			const doorLink = pickOne(links);
+			
+			// upgrade linkType
+			randomCell.makeDoor(doorLink.dir, keyType);
+
+			if (reachable(randomCell, pivot)) {
+				return [ randomCell, doorLink.cell ];
+			}
+			else {
+				assert (reachable(doorLink.cell, pivot), "Something went wrong while making doors");
+				return [ doorLink.cell, randomCell ]; 
+			}
+		}
+		else {
+			valid = false;
+			// try again
+		}
+		// pick a random link that is not a door
+		assert ((--it) > 0, "Maximum iterations reached");
+	}
+	while (!valid);
 }
