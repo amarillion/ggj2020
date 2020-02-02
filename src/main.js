@@ -20,6 +20,7 @@ import {
 import MenuState from './MenuState';
 import { levelData } from './level';
 import KeyDialog, { KeyManager } from './KeyDialog';
+import IntroState from './IntroState';
 
 class Game extends Phaser.Game {
 	
@@ -494,6 +495,7 @@ class GameState {
 window.onload = () => {
 	const game = new Game();
 	game.state.add("MenuState", MenuState);
+	game.state.add("IntroState", IntroState);
 	game.state.add("GameState", GameState);
 	game.state.start("MenuState");
 };

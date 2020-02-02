@@ -1,3 +1,5 @@
+import { lipsumText } from "./IntroState";
+
 // import textPlugin from "../plugins/Text";
 
 const MENU_BACKGROUND = 'TODO';
@@ -26,7 +28,7 @@ export default class {
 		newGame.inputEnabled = true;
 		entryPosition += 60;
 
-		newGame.events.onInputDown.add(() => this.state.start("GameState"));
+		newGame.events.onInputDown.add(() => this.state.start("IntroState", true, false, lipsumText, "GameState"));
 
 		// var credits = this.game.add.text(menuPositionX, menuPositionY + entryPosition, 'Credits', GENERAL_STYLE);
 		// credits.inputEnabled = true;
