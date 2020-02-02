@@ -101,6 +101,7 @@ class GameState {
 		this.debugKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
 		this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 		this.escKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
+		this.bsKey = this.game.input.keyboard.addKey(Phaser.Keyboard.DELETE);
 
 		this.spaceKey.onDown.add(function() {
 			if (this.dialogs.hasActiveDialog()) {
@@ -108,12 +109,14 @@ class GameState {
 			}
 		}, this);
 
-		this.escKey.onDown.add(function() {
-			console.log ("Escape pressed");
+		const closeDialog = () => {
 			if (this.dialogs.hasActiveDialog()) {
 				this.dialogs.close();
 			}
-		}, this);
+		};
+
+		this.escKey.onDown.add(closeDialog);
+		this.bsKey.onDown.add(closeDialog);
 
 		this.debugKey.onDown.add(() => {
 			if (!this.dialogs.hasActiveDialog()) {
@@ -136,7 +139,7 @@ class GameState {
 		
 		//Stop the following keys from propagating up to the browser
 		this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR,
-			Phaser.Keyboard.ENTER, Phaser.Keyboard.ESC]);
+			Phaser.Keyboard.ENTER, Phaser.Keyboard.ESC, Phaser.Keyboard.DELETE]);
 
 		// startFrustrationClock
 		this.game.time.events.repeat(Phaser.Timer.SECOND * 60, 100, this.frustrationTicker, this);
