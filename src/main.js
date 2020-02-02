@@ -50,9 +50,6 @@ class GameState {
 	constructor() {
 		console.log("GameState.constructor");
 
-		this.totalMinute = 0;
-		this.frustrationScore = 0;
-		this.frustrationLevel = 0;
 		this.collectedKeys = {};
 		this.doorsAndKeys = {
 			[DOOR_TILE_BLUE]: {
@@ -82,8 +79,7 @@ class GameState {
 		this.music = this.game.add.audio('mainSoundtrack');
 		this.music.play();
 
-		this.currentLevel = 0;
-		this.levelConfig = levelData[this.currentLevel]; 
+		this.levelConfig = levelData[this.game.data.currentLevel]; 
 		this.keyManager = new KeyManager();
 		this.dialogs = new KeyDialog(this, this.keyManager);
 		
@@ -269,9 +265,9 @@ class GameState {
 
 		this.game.camera.follow(this.player);
 
-		this.levelText = this.game.add.text(16, 16, 'Level: ' + (this.currentLevel + 1), { fontSize: '32px', fill: '#FFF', stroke: '#000000', strokeThickness: 6 });
+		this.levelText = this.game.add.text(16, 16, 'Level: ' + (this.game.data.currentLevel + 1), { fontSize: '32px', fill: '#FFF', stroke: '#000000', strokeThickness: 6 });
 		this.levelText.fixedToCamera = true;
-		this.frustrationText = this.game.add.text(16, 56, 'Frustration x' + this.frustrationLevel +': ' + this.frustrationScore, { fontSize: '32px', fill: '#FFF', stroke: '#000000', strokeThickness: 6 });
+		this.frustrationText = this.game.add.text(16, 56, 'Frustration x' + this.game.data.frustrationLevel +': ' + this.game.data.frustrationScore, { fontSize: '32px', fill: '#FFF', stroke: '#000000', strokeThickness: 6 });
 		this.frustrationText.fixedToCamera = true;
 
 		this.redKeyText = this.game.add.text(16, 96, 'Red keys: 0', { fontSize: '24px', fill: '#E00', stroke: '#000000', strokeThickness: 6 });
@@ -283,11 +279,11 @@ class GameState {
 	}
 
 	updateText() {
-		this.levelText.text = 'Level: ' + (this.currentLevel + 1);
+		this.levelText.text = 'Level: ' + (this.game.data.currentLevel + 1);
 		this.redKeyText.text =  'Red keys: ' + (this.collectedKeys[RED] || 0);
 		this.yellowKeyText.text = 'Yellow keys: ' + (this.collectedKeys[YELLOW] || 0);
 		this.blueKeyText.text = 'Blue keys: ' + (this.collectedKeys[BLUE] || 0);
-		this.frustrationText.text = 'Frustration x' + this.frustrationLevel +': ' + this.frustrationScore;
+		this.frustrationText.text = 'Frustration x' + this.game.data.frustrationLevel +': ' + this.game.data.frustrationScore;
 	}
 
 	clearLevel() {
@@ -299,8 +295,8 @@ class GameState {
 		this.decreaseFrustrationPoint(LEVEL_GAIN);
 
 		this.clearLevel();
-		this.currentLevel += 1;
-		this.levelConfig = levelData[this.currentLevel]; 
+		this.game.data.currentLevel += 1;
+		this.levelConfig = levelData[this.game.data.currentLevel]; 
 		this.initLevel(); // initialize next level again
 	}
 
@@ -499,7 +495,7 @@ class GameState {
 	// Just Fibonnacci Series with a loop
 	frustrationFactor() {
 		var a = 1, b = 0, temp;
-		let frustrationLevelTmp = this.frustrationLevel;
+		let frustrationLevelTmp = this.game.data.frustrationLevel;
 		while ( frustrationLevelTmp >= 0){
 			temp = a;
 			a = a + b;
@@ -511,28 +507,28 @@ class GameState {
 	}
 
 	increaseFrustrationLevel() {
-		this.frustrationLevel++;
+		this.game.data.frustrationLevel++;
 		this.updateText();
-		console.log("INCREASED frustration level to " + this.frustrationLevel );
+		console.log("INCREASED frustration level to " + this.game.data.frustrationLevel );
 	}
 
 	increaseFrustrationPoint(point) {
-		this.frustrationScore += point;
+		this.game.data.frustrationScore += point;
 		this.updateText();
 		console.log("ADDED " + point + " frustration points!");
 	}
 
 	decreaseFrustrationPoint(point) {
-		let newScore = this.frustrationScore - point;
-		this.frustrationScore = newScore < 0 ? 0 : newScore;
+		let newScore = this.game.data.frustrationScore - point;
+		this.game.data.frustrationScore = newScore < 0 ? 0 : newScore;
 		this.updateText();
 		console.log("REMOVED " + point + " frustration points!");
 	}
 
 	frustrationTicker() {
-		this.totalMinute++;
+		this.game.data.totalMinute++;
 		this.increaseFrustrationLevel();
-		let frustrationToAdd = this.frustrationFactor() * ( TIME_HIT + this.totalMinute );
+		let frustrationToAdd = this.frustrationFactor() * ( TIME_HIT + this.game.data.totalMinute );
 		this.increaseFrustrationPoint(frustrationToAdd);
 	}
 }
@@ -572,6 +568,12 @@ class BootState {
 
 	create() {
 		this.state.start("MenuState");
+		this.game.data = { 
+			currentLevel: 0,
+			totalMinute: 0,
+			frustrationScore: 0,
+			frustrationLevel: 0,
+		};
 	}
 }
 
