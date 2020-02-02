@@ -6,7 +6,7 @@
 import 'expose-loader?PIXI!phaser-ce/build/custom/pixi.js';
 import 'expose-loader?p2!phaser-ce/build/custom/p2.js';
 import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js';
-import { genMazeAndAddDoors } from './maze';
+import { genMazeAndAddDoors, pickOne } from './maze';
 import { 
 	GAME_SCALE, WALL_TILE, 
 	KEY_TILE_BLUE, KEY_TILE_YELLOW, KEY_TILE_RED,
@@ -15,7 +15,8 @@ import {
 	START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, 
 	TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W,
 	MONSTER_HIT, TIME_HIT, KEY_GAIN, DOOR_GAIN, LEVEL_GAIN, // frustration related
-	DEBUG_HIT
+	DEBUG_HIT,
+	AUDIO_VOLUME
 } from './constants';
 
 import MenuState from './MenuState';
@@ -110,6 +111,7 @@ class GameState {
 		const closeDialog = () => {
 			if (this.dialogs.hasActiveDialog()) {
 				this.dialogs.close();
+				this.sfx['sfx_menu5'].play();
 			}
 		};
 
@@ -118,6 +120,7 @@ class GameState {
 
 		this.debugKey.onDown.add(() => {
 			if (!this.dialogs.hasActiveDialog()) {
+				this.sfx['sfx_menu4'].play();
 				this.dialogs.showDialog();
 				this.increaseFrustrationLevel();
 			}
@@ -126,12 +129,14 @@ class GameState {
 		// Capture key presses for dialogs
 		this.cursors.up.onDown.add(function() {
 			if (this.dialogs.hasActiveDialog()) {
+				this.sfx['sfx_menu1'].play();
 				this.dialogs.upPressed();
 			}
 		}, this);
 
 		this.cursors.down.onDown.add(function() { 
 			if (this.dialogs.hasActiveDialog()) {
+				this.sfx['sfx_menu1'].play();
 				this.dialogs.downPressed();
 			}
 		}, this);
@@ -142,6 +147,15 @@ class GameState {
 
 		// startFrustrationClock
 		this.game.time.events.repeat(Phaser.Timer.SECOND * 60, 100, this.frustrationTicker, this);
+
+		this.sfx = {};
+		for (const key of ['sfx_dmg1',
+			'sfx_dmg2', 'sfx_dmg3', 'sfx_dmg4', 'sfx_dmg5', 'sfx_dmg6',
+			'sfx_dmg7', 'sfx_dmg8',	'sfx_dmg9', 'sfx_menu1', 'sfx_menu2',
+			'sfx_menu3', 'sfx_menu4', 'sfx_menu5', 'sfx_foot1', 'sfx_foot2',
+			'sfx_vic1','sfx_vic2','sfx_unlock', 'sfx_key1', 'sfx_key2', 'sfx_key3']) {
+			this.sfx[key] = this.game.add.audio(key, AUDIO_VOLUME);
+		}
 	}
 
 	initLevel() {
@@ -157,6 +171,8 @@ class GameState {
 	}
 
 	refreshLevel() {
+		this.playerAlreadyDead = false;
+		
 		// create a tilemap
 		this.map = this.game.add.tilemap();
 		this.map.setTileSize(TILE_WIDTH, TILE_HEIGHT);
@@ -288,7 +304,7 @@ class GameState {
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
 
-		if (!this.uiBlocked) {
+		if (!(this.uiBlocked || this.playerAlreadyDead)) {
 			if (this.cursors.left.isDown)
 			{
 				this.player.body.velocity.x = -UNIT;
@@ -393,6 +409,7 @@ class GameState {
 					this.map.putTile(openTile, x, y);
 					// Unlocked!
 					this.decreaseFrustrationPoint(DOOR_GAIN);
+					this.sfx.sfx_unlock.play();
 				}
 
 			}
@@ -408,13 +425,35 @@ class GameState {
 		this.collectedKeys[keyId] = (this.collectedKeys[keyId]+1) || 1 ;
 		key.kill();
 		this.decreaseFrustrationPoint(KEY_GAIN);
+		this.sfx.sfx_key2.play();
 	}
 
 	playerHitsMonster(player, monster) {
+		if (this.playerAlreadyDead) return;
+		this.playerAlreadyDead = true; // prevent repeated trigger
+
 		this.increaseFrustrationLevel();
 		let frustrationToAdd = this.frustrationFactor() * MONSTER_HIT;
 		this.increaseFrustrationPoint(frustrationToAdd);
-		this.resetLevel();
+
+		this.music.stop();
+
+		const soundKey = pickOne(['sfx_dmg1',
+		'sfx_dmg2',
+		'sfx_dmg3',
+		'sfx_dmg4',
+		'sfx_dmg5',
+		'sfx_dmg6',
+		'sfx_dmg7',
+		'sfx_dmg8',
+		'sfx_dmg9']);
+		this.sfx[soundKey].play();
+
+		this.game.time.events.add(Phaser.Timer.SECOND * 2, () => {
+			this.music.play();
+			this.resetLevel();
+			this.playerAlreadyDead = false;
+		});
 	}
 
 	monsterHitsWall(monster, wall) {
@@ -497,7 +536,30 @@ class BootState {
 		this.load.image("menubg", "assets/menubg.png");
 		this.load.spritesheet(SPRITESHEET, "assets/sprites.png", TILE_WIDTH, TILE_HEIGHT, NUM_TILES);
 		this.load.tilemap("level", "assets/placeholder-level.json", null, Phaser.Tilemap.TILED_JSON);
-		this.load.audio('mainSoundtrack', ['assets/music.mp3', 'assets/music.ogg']);
+		this.load.audio('mainSoundtrack', 'assets/music.ogg');
+		this.load.audio('altSoundtrack', 'assets/music_alternate.ogg');
+		this.load.audio('sfx_dmg1', 'assets/sfx/Damage 3 Ow.ogg');
+		this.load.audio('sfx_dmg2', 'assets/sfx/Damage 6 Death-Why Me.ogg');
+		this.load.audio('sfx_dmg3', 'assets/sfx/Damage 8 That Hurt.ogg');
+		this.load.audio('sfx_dmg4', 'assets/sfx/Damage 5 Death-I Just Got Tinder!.ogg');
+		this.load.audio('sfx_dmg5', 'assets/sfx/Damage 7 Ow 2.ogg');
+		this.load.audio('sfx_dmg6', 'assets/sfx/Damage 2 Stop It!.ogg');
+		this.load.audio('sfx_dmg7', 'assets/sfx/Damage 4 Death-My Mortgage!.ogg');
+		this.load.audio('sfx_dmg8', 'assets/sfx/Damage 9 Oh Man.ogg');
+		this.load.audio('sfx_dmg9', 'assets/sfx/Damage 1 Ouch.ogg');
+		this.load.audio('sfx_menu1', 'assets/sfx/Menu manipulation sound 1.ogg');
+		this.load.audio('sfx_menu2', 'assets/sfx/Menu manipulation sound 2.ogg');
+		this.load.audio('sfx_menu3', 'assets/sfx/Menu manipulation sound 3.ogg');
+		this.load.audio('sfx_menu4', 'assets/sfx/Debug transition enter.ogg');
+		this.load.audio('sfx_menu5', 'assets/sfx/Debug transition exit.ogg');
+		this.load.audio('sfx_foot1', 'assets/sfx/Footsteps double.ogg');
+		this.load.audio('sfx_foot2', 'assets/sfx/Footsteps single.ogg');
+		this.load.audio('sfx_vic1', 'assets/sfx/Victory 1.ogg');
+		this.load.audio('sfx_vic2', 'assets/sfx/Victory 2.ogg');
+		this.load.audio('sfx_unlock', 'assets/sfx/Door unlock.ogg');
+		this.load.audio('sfx_key1', 'assets/sfx/Pick up key 1.ogg');
+		this.load.audio('sfx_key2', 'assets/sfx/Pick up key 2.1.ogg');
+		this.load.audio('sfx_key3', 'assets/sfx/Pick up key 2.ogg');
 	}
 
 	create() {

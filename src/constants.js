@@ -51,3 +51,5 @@ export const EMPTY_TILE = 0x50;
 export const GOAL_TILE = 0x52; // tbd
 export const START_TILE = 0x00;
 export const ENEMY_TILE = 0x10;
+
+export const AUDIO_VOLUME = 3.0;
