@@ -90,8 +90,6 @@ class GameState {
 		this.initLevel();
 		
 		this.cursors = this.game.input.keyboard.createCursorKeys();
-		
-		console.log (Phaser.Keyboard);
 
 		this.debugKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
 		this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
