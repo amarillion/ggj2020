@@ -5,6 +5,7 @@ This project was created for the Global Game Jam 2020.
 
 Play online: http://amarillion.github.io/ggj2020
 Watch the trailer: https://www.youtube.com/watch?v=9XTpE9SMxvE
+GGJ game page: https://globalgamejam.org/2020/games/you-can%E2%80%99t-repair-bad-1
 
 ## How to build
 
