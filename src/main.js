@@ -18,6 +18,7 @@ import {
 
 import MenuState from './MenuState';
 import { levelData } from './level';
+import KeyDialog, { KeyManager } from './KeyDialog';
 
 class Game extends Phaser.Game {
 	
@@ -87,7 +88,53 @@ class GameState {
 		this.currentLevel = 0;
 		this.levelConfig = levelData[this.currentLevel]; 
 		this.initLevel();
+		
+		this.keyManager = new KeyManager();
+		this.dialogs = new KeyDialog(this, this.keyManager);
+
 		this.cursors = this.game.input.keyboard.createCursorKeys();
+		
+		console.log (Phaser.Keyboard);
+
+		this.debugKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+		this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		this.escKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
+
+		this.spaceKey.onDown.add(function() {
+			if (this.dialogs.hasActiveDialog()) {
+				this.dialogs.spacePressed();
+			}
+		}, this);
+
+		this.escKey.onDown.add(function() {
+			console.log ("Escape pressed");
+			if (this.dialogs.hasActiveDialog()) {
+				this.dialogs.close();
+			}
+		}, this);
+
+		this.debugKey.onDown.add(() => {
+			if (!this.dialogs.hasActiveDialog()) {
+				this.dialogs.showDialog();
+			}
+		});
+
+		// Capture key presses for dialogs
+		this.cursors.up.onDown.add(function() {
+			if (this.dialogs.hasActiveDialog()) {
+				this.dialogs.upPressed();
+			}
+		}, this);
+
+		this.cursors.down.onDown.add(function() { 
+			if (this.dialogs.hasActiveDialog()) {
+				this.dialogs.downPressed();
+			}
+		}, this);
+		
+		//Stop the following keys from propagating up to the browser
+		this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR,
+			Phaser.Keyboard.ENTER, Phaser.Keyboard.ESC]);
 	}
 
 	initLevel() {
@@ -211,6 +258,10 @@ class GameState {
 	update() {
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
+
+		if (this.uiBlocked) {
+			return;
+		}
 
 		if (this.cursors.left.isDown)
 		{

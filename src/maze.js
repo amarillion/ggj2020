@@ -4,7 +4,8 @@ import {
 	EMPTY_TILE, WALL_TILE, 
 	START_TILE, GOAL_TILE, 
 	KEY_TILE, KEY2_TILE, KEY3_TILE,
-	DOOR_TILE, DOOR2_TILE, DOOR3_TILE
+	DOOR_TILE, DOOR2_TILE, DOOR3_TILE,
+	RED, YELLOW, BLUE
 } from "./constants";
 
 /*
@@ -447,10 +448,6 @@ export function genMazeAndAddDoors(w, h, doorFunc = addDoors2) {
 		}
 	}
 }
-
-const RED = 2;
-const YELLOW = 3;
-const BLUE = 4;
 
 export function addDoors1(grid) {
 	const [ , key2, key3 ] = shuffle([ RED, BLUE, YELLOW ]);

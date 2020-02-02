@@ -1,3 +1,7 @@
+export const RED = 2;
+export const YELLOW = 3;
+export const BLUE = 4;
+
 export const GAME_SCALE = 3.0;
 
 export const TILE_WIDTH = 16;
