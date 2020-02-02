@@ -1,34 +1,35 @@
 import { 
 	addDoors1, 
-	addDoors2, 
+	addDoors2,
+	addDoors0, 
 	// addDoors3
 } from "./maze";
 
 export const levelData = [
 	// 0
 	{
-		w: 6, h: 4,
+		w: 5, h: 4,
 		enemySpeedFactor: 0.8,
-		doorFunc: addDoors1,
+		doorFunc: addDoors0,
 		enemyCount: 2
 	},
 	// 1
 	{
-		w: 7, h: 5,
+		w: 6, h: 4,
 		enemySpeedFactor: 0.9,
-		doorFunc: addDoors2,
+		doorFunc: addDoors1,
 		enemyCount: 3
 	},
 	// 2
 	{
-		w: 7, h: 6,
+		w: 6, h: 5,
 		enemySpeedFactor: 1.0,
-		doorFunc: addDoors2,
+		doorFunc: addDoors1,
 		enemyCount: 5
 	},
 	// 3
 	{
-		w: 6, h: 10,
+		w: 7, h: 8,
 		enemySpeedFactor: 1.0,
 		doorFunc: addDoors2,
 		enemyCount: 8

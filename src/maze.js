@@ -446,7 +446,8 @@ export function genMazeAndAddDoors(w, h, doorFunc = addDoors2) {
 	}
 }
 
-export function addDoors1(grid) {
+// possible with regular mapping
+export function addDoors0(grid) {
 	const [ , key2, key3 ] = shuffle(ALL_KEYS);
 
 	const allNodes = grid.allNodes();
@@ -456,6 +457,20 @@ export function addDoors1(grid) {
 	makeStart(expandNodes(b));
 	dropKey(expandNodes(b), key2);
 	dropKey(expandNodes(aa), key3);
+	makeGoal(expandNodes(ab));
+}
+
+// only possible by changing mapping
+export function addDoors1(grid) {
+	const [ , key2, key3 ] = shuffle(ALL_KEYS);
+
+	const allNodes = grid.allNodes();
+	const randomPivot = pickOne(allNodes);
+	const [ a, b ] = splitMaze(randomPivot, key2);
+	const [ aa, ab ] = splitMaze(a, key3); // aa is linked to a. ab is linked to aa
+	makeStart(expandNodes(b));
+	dropKey(expandNodes(b), key3);
+	dropKey(expandNodes(aa), key2);
 	makeGoal(expandNodes(ab));
 }
 
@@ -478,6 +493,7 @@ export function shuffle(array) {
 	return array;
 }
 
+// only possible by changing mapping
 export function addDoors2(grid) {
 	const [ key1, key2, key3 ] = shuffle(ALL_KEYS);
 	
@@ -489,9 +505,9 @@ export function addDoors2(grid) {
 	
 	// ab <-> aa <-> ba <-> bb
 	makeStart(expandNodes(ba));
-	dropKey(expandNodes(ba), key2);
-	dropKey(expandNodes(bb), key1);
-	dropKey(expandNodes(aa), key3);
+	dropKey(expandNodes(ba), key3);
+	dropKey(expandNodes(bb), key2);
+	dropKey(expandNodes(aa), key1);
 	makeGoal(expandNodes(ab));
 }
 /*
