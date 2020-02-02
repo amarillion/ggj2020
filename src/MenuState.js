@@ -49,6 +49,15 @@ export default class {
 		credits.events.onInputDown.add(function () {
 			this.state.start("IntroState", true, false, creditsText, "MenuState");
 		}, this);
+
+		// reset game data
+		this.game.data = { 
+			currentLevel: 0,
+			totalMinute: 0,
+			frustrationScore: 0,
+			frustrationLevel: 0,
+		};
+
 	}
 
 }

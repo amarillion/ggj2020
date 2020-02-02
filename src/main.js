@@ -517,6 +517,11 @@ class GameState {
 	increaseFrustrationPoint(point) {
 		this.game.data.frustrationScore += point;
 		this.updateText();
+		
+		if (this.game.data.frustrationScore > 100) {
+			this.state.start("IntroState", true, false, "GAME OVER", "MenuState");
+		}
+
 		console.log("ADDED " + point + " frustration points!");
 	}
 
@@ -570,12 +575,6 @@ class BootState {
 
 	create() {
 		this.state.start("MenuState");
-		this.game.data = { 
-			currentLevel: 0,
-			totalMinute: 0,
-			frustrationScore: 0,
-			frustrationLevel: 0,
-		};
 	}
 }
 
