@@ -52,7 +52,7 @@ class GameState {
 
 		this.totalMinute = 0;
 		this.frustrationScore = 0;
-		this.frustrationLevel = 1;
+		this.frustrationLevel = 0;
 		this.collectedKeys = {};
 		this.doorsAndKeys = {
 			[DOOR_TILE_BLUE]: {
