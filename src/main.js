@@ -97,34 +97,32 @@ class GameState {
 		this.debugKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
 		this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 		this.escKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
-		this.bsKey = this.game.input.keyboard.addKey(Phaser.Keyboard.DELETE);
+		this.bsKey = this.game.input.keyboard.addKey(Phaser.Keyboard.TAB);
 
 		this.spaceKey.onDown.add(function() {
 			if (this.dialogs.hasActiveDialog()) {
 				this.dialogs.spacePressed();
-
+				this.sfx['sfx_menu2'].play();
 				let frustrationToAdd = this.frustrationFactor() * DEBUG_HIT;
 				this.increaseFrustrationPoint(frustrationToAdd);
 			}
 		}, this);
 
-		const closeDialog = () => {
+		const toggleDialog = () => {
 			if (this.dialogs.hasActiveDialog()) {
 				this.dialogs.close();
 				this.sfx['sfx_menu5'].play();
 			}
-		};
-
-		this.escKey.onDown.add(closeDialog);
-		this.bsKey.onDown.add(closeDialog);
-
-		this.debugKey.onDown.add(() => {
-			if (!this.dialogs.hasActiveDialog()) {
+			else {
 				this.sfx['sfx_menu4'].play();
 				this.dialogs.showDialog();
 				this.increaseFrustrationLevel();
 			}
-		});
+		};
+
+		this.escKey.onDown.add(toggleDialog);
+		this.bsKey.onDown.add(toggleDialog);
+		this.debugKey.onDown.add(toggleDialog);
 
 		// Capture key presses for dialogs
 		this.cursors.up.onDown.add(function() {
