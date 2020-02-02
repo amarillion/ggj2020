@@ -3,9 +3,9 @@ import {
 	TILE_WIDTH, TILE_HEIGHT, 
 	EMPTY_TILE, WALL_TILE, 
 	START_TILE, GOAL_TILE, 
-	KEY_TILE, KEY2_TILE, KEY3_TILE,
-	DOOR_TILE, DOOR2_TILE, DOOR3_TILE,
-	RED, YELLOW, BLUE
+	KEY_TILE_BLUE, KEY_TILE_YELLOW, KEY_TILE_RED,
+	DOOR_TILE_BLUE, DOOR_TILE_YELLOW, DOOR_TILE_RED,
+	ALL_KEYS
 } from "./constants";
 
 /*
@@ -38,7 +38,7 @@ export class Cell {
 
 	makeDoor(dir, doorType, bidi=true) {
 		assert(this.linkType(dir)) == 1; // must already be open link
-		assert(doorType > 1, `${doorType} must be in range 2-4`);
+		assert(ALL_KEYS.indexOf(doorType) >= 0, `${doorType} must be in range ${ALL_KEYS}`);
 		this.linkTypes[dir] = doorType;
 		if (bidi) {
 			const other = this.links[dir];
@@ -221,11 +221,8 @@ export class Grid {
 			const yy = cell.y * SCALE;
 			
 			if (cell.object) {
-				switch (cell.object) {
-				case 2: map.putTile(KEY_TILE, xx + MID, yy + MID); break;
-				case 3: map.putTile(KEY2_TILE, xx + MID, yy + MID); break;
-				case 4: map.putTile(KEY3_TILE, xx + MID, yy + MID); break;
-				}
+				assert (ALL_KEYS.indexOf(cell.object) >= 0);
+				map.putTile(cell.object, xx + MID, yy + MID);
 			}
 
 			if (cell.playerStart) {
@@ -246,9 +243,9 @@ export class Grid {
 				}
 				switch (eastLink) {
 				case 0: break; // full wall 
-				case 2: map.putTile(DOOR_TILE, xx + SCALE, yy + MID); break;
-				case 3: map.putTile(DOOR2_TILE, xx + SCALE, yy + MID); break;
-				case 4: map.putTile(DOOR3_TILE, xx + SCALE, yy + MID); break;
+				case KEY_TILE_BLUE: map.putTile(DOOR_TILE_BLUE, xx + SCALE, yy + MID); break;
+				case KEY_TILE_YELLOW: map.putTile(DOOR_TILE_YELLOW, xx + SCALE, yy + MID); break;
+				case KEY_TILE_RED: map.putTile(DOOR_TILE_RED, xx + SCALE, yy + MID); break;
 				default: assert(false, `Error in eastLink, got ${eastLink}`);
 				}
 			}
@@ -261,9 +258,9 @@ export class Grid {
 				}
 				switch (southLink) {
 				case 0: break; // full wall 
-				case 2: map.putTile(DOOR_TILE,  xx + MID, yy + SCALE); break;
-				case 3: map.putTile(DOOR2_TILE, xx + MID, yy + SCALE); break;
-				case 4: map.putTile(DOOR3_TILE, xx + MID, yy + SCALE); break;	
+				case KEY_TILE_BLUE: map.putTile(DOOR_TILE_BLUE,  xx + MID, yy + SCALE); break;
+				case KEY_TILE_YELLOW: map.putTile(DOOR_TILE_YELLOW, xx + MID, yy + SCALE); break;
+				case KEY_TILE_RED: map.putTile(DOOR_TILE_RED, xx + MID, yy + SCALE); break;	
 				default: assert(false, `Error in southLink, got ${southLink}`);
 				}
 			}
@@ -450,7 +447,7 @@ export function genMazeAndAddDoors(w, h, doorFunc = addDoors2) {
 }
 
 export function addDoors1(grid) {
-	const [ , key2, key3 ] = shuffle([ RED, BLUE, YELLOW ]);
+	const [ , key2, key3 ] = shuffle(ALL_KEYS);
 
 	const allNodes = grid.allNodes();
 	const randomPivot = pickOne(allNodes);
@@ -482,7 +479,7 @@ export function shuffle(array) {
 }
 
 export function addDoors2(grid) {
-	const [ key1, key2, key3 ] = shuffle([ RED, BLUE, YELLOW ]);
+	const [ key1, key2, key3 ] = shuffle(ALL_KEYS);
 	
 	const allNodes = grid.allNodes();
 	const randomPivot = pickOne(allNodes);

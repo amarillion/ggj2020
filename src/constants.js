@@ -1,7 +1,3 @@
-export const RED = 2;
-export const YELLOW = 3;
-export const BLUE = 4;
-
 export const GAME_SCALE = 3.0;
 
 export const TILE_WIDTH = 16;
@@ -26,18 +22,24 @@ export const ENEMY_TILE = 3;
 
 export const WALL_TILE = 0x51;
 
-export const DOOR_TILE = 0x20; // closed
-export const DOOR2_TILE = 0x30; // closed
-export const DOOR3_TILE = 0x40; // closed
+export const DOOR_TILE_BLUE = 0x20; // closed
+export const DOOR_TILE_YELLOW = 0x30; // closed
+export const DOOR_TILE_RED = 0x40; // closed
 
-export const DOOR_OPEN_TILE = 0x21; // open
-export const DOOR2_OPEN_TILE = 0x31; // open
-export const DOOR3_OPEN_TILE = 0x41; // open
+export const DOOR_OPEN_TILE_BLUE = 0x21; // open
+export const DOOR_OPEN_TILE_YELLOW = 0x31; // open
+export const DOOR_OPEN_TILE_RED = 0x41; // open
 
-export const KEY_TILE = 0x22;
-export const KEY2_TILE = 0x32;
-export const KEY3_TILE = 0x42;
+export const KEY_TILE_BLUE = 0x22;
+export const KEY_TILE_YELLOW = 0x32;
+export const KEY_TILE_RED = 0x42;
 
+export const RED = KEY_TILE_RED;
+export const YELLOW = KEY_TILE_YELLOW;
+export const BLUE = KEY_TILE_BLUE;
+
+export const ALL_KEYS = [ KEY_TILE_RED, KEY_TILE_YELLOW, KEY_TILE_BLUE ];
+		
 export const EMPTY_TILE = 0x50;
 export const GOAL_TILE = 0x52; // tbd
 export const START_TILE = 0x00;

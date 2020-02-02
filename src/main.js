@@ -6,12 +6,12 @@
 import 'expose-loader?PIXI!phaser-ce/build/custom/pixi.js';
 import 'expose-loader?p2!phaser-ce/build/custom/p2.js';
 import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js';
-import { Grid, recursiveBackTracker, addDoors, genMazeAndAddDoors } from './maze';
+import { genMazeAndAddDoors } from './maze';
 import { 
 	GAME_SCALE, WALL_TILE, 
-	KEY_TILE, KEY2_TILE, KEY3_TILE,
-	DOOR_TILE, DOOR2_TILE, DOOR3_TILE,
-	DOOR_OPEN_TILE, DOOR2_OPEN_TILE, DOOR3_OPEN_TILE,
+	KEY_TILE_BLUE, KEY_TILE_YELLOW, KEY_TILE_RED,
+	DOOR_TILE_BLUE, DOOR_TILE_YELLOW, DOOR_TILE_RED,
+	DOOR_OPEN_TILE_BLUE, DOOR_OPEN_TILE_YELLOW, DOOR_OPEN_TILE_RED,
 	START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, 
 	TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W 
 } from './constants';
@@ -51,17 +51,17 @@ class GameState {
 		this.frustrationCoeff = 1;
 		this.collectedKeys = {};
 		this.doorsAndKeys = {
-			[DOOR_TILE]: {
-				'openTile': DOOR_OPEN_TILE,
-				'requiredKey': KEY_TILE
+			[DOOR_TILE_BLUE]: {
+				'openTile': DOOR_OPEN_TILE_BLUE,
+				'requiredKey': KEY_TILE_BLUE
 			},
-			[DOOR2_TILE]: {
-				'openTile': DOOR2_OPEN_TILE,
-				'requiredKey': KEY2_TILE
+			[DOOR_TILE_YELLOW]: {
+				'openTile': DOOR_OPEN_TILE_YELLOW,
+				'requiredKey': KEY_TILE_YELLOW
 			},
-			[DOOR3_TILE]: {
-				'openTile': DOOR3_OPEN_TILE,
-				'requiredKey': KEY3_TILE
+			[DOOR_TILE_RED]: {
+				'openTile': DOOR_OPEN_TILE_RED,
+				'requiredKey': KEY_TILE_RED
 			}
 		};
 	}
@@ -178,9 +178,9 @@ class GameState {
 					case EMPTY_TILE: // open area
 						this.emptyTilesCoordinates.push({ 'x': tile.worldX, 'y': tile.worldY });
 						break;
-					case DOOR_TILE: // door closed
-					case DOOR2_TILE: // door closed
-					case DOOR3_TILE: // door closed
+					case DOOR_TILE_BLUE: // door closed
+					case DOOR_TILE_YELLOW: // door closed
+					case DOOR_TILE_RED: // door closed
 						tile.properties['is_closed_door'] = true;
 						tile.properties['x'] = x;
 						tile.properties['y'] = y;
@@ -190,9 +190,9 @@ class GameState {
 						break;
 					case ENEMY_TILE: // enemy
 						break;
-					case KEY_TILE: // key1
-					case KEY2_TILE: // key2
-					case KEY3_TILE: // key3
+					case KEY_TILE_BLUE: // key1
+					case KEY_TILE_YELLOW: // key2
+					case KEY_TILE_RED: // key3
 						//create object
 						let newKey = this.keys.create(tile.worldX/GAME_SCALE + BODY_W/2, tile.worldY/GAME_SCALE + BODY_H/2, SPRITESHEET, index);
 						newKey.data = { 'key_id' : index};
@@ -210,9 +210,9 @@ class GameState {
 
 		this.keys.scale.setTo(GAME_SCALE);
 		this.map.setCollision(WALL_TILE, true, this.l1);
-		this.map.setCollision(DOOR_TILE, true, this.l1);
-		this.map.setCollision(DOOR2_TILE, true, this.l1);
-		this.map.setCollision(DOOR3_TILE, true, this.l1);
+		this.map.setCollision(DOOR_TILE_BLUE, true, this.l1);
+		this.map.setCollision(DOOR_TILE_YELLOW, true, this.l1);
+		this.map.setCollision(DOOR_TILE_RED, true, this.l1);
 		this.map.setCollision(GOAL_TILE, true, this.l1);
 
 		// this.map.createFromObjects('Tile Layer 1', KEY_TILE, SPRITESHEET, KEY_TILE, true, false, this.keys);
