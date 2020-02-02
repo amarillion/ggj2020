@@ -13,7 +13,8 @@ import {
 	DOOR_TILE_BLUE, DOOR_TILE_YELLOW, DOOR_TILE_RED,
 	DOOR_OPEN_TILE_BLUE, DOOR_OPEN_TILE_YELLOW, DOOR_OPEN_TILE_RED,
 	START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, 
-	TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W 
+	TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W,
+	MONSTER_HIT, TIME_HIT, KEY_GAIN, DOOR_GAIN, LEVEL_GAIN // frustration related
 } from './constants';
 
 import MenuState from './MenuState';
@@ -47,8 +48,9 @@ class GameState {
 	constructor() {
 		console.log("GameState.constructor");
 
+		this.totalMinute = 0;
 		this.frustrationScore = 0;
-		this.frustrationCoeff = 1;
+		this.frustrationLevel = 1;
 		this.collectedKeys = {};
 		this.doorsAndKeys = {
 			[DOOR_TILE_BLUE]: {
@@ -135,6 +137,9 @@ class GameState {
 		//Stop the following keys from propagating up to the browser
 		this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR,
 			Phaser.Keyboard.ENTER, Phaser.Keyboard.ESC]);
+
+		// startFrustrationClock
+		this.game.time.events.repeat(Phaser.Timer.SECOND * 60, 100, this.frustrationTicker, this);
 	}
 
 	initLevel() {
@@ -249,6 +254,8 @@ class GameState {
 	}
 
 	nextLevel() {
+		this.decreaseFrustrationPoint(LEVEL_GAIN);
+
 		this.clearLevel();
 		this.currentLevel += 1;
 		this.levelConfig = levelData[this.currentLevel]; 
@@ -363,9 +370,9 @@ class GameState {
 					let openTile = this.doorsAndKeys[index]['openTile'];
 					let x = wall.x;
 					let y = wall.y;
-					console.log({'x': x, 'y': y});
 					this.map.putTile(openTile, x, y);
-					console.log("Unlocked!" + openTile);
+					// Unlocked!
+					this.decreaseFrustrationPoint(DOOR_GAIN);
 				}
 
 			}
@@ -380,12 +387,13 @@ class GameState {
 		let keyId = key.data.key_id;
 		this.collectedKeys[keyId] = (this.collectedKeys[keyId]+1) || 1 ;
 		key.kill();
-		console.log("Collected the key with ID: " + keyId);
+		this.decreaseFrustrationPoint(KEY_GAIN);
 	}
 
 	playerHitsMonster(player, monster) {
-		
-		console.log("MONSTER BITES YOU");
+		this.increaseFrustrationLevel();
+		let frustrationToAdd = this.frustrationFactor() * MONSTER_HIT;
+		this.increaseFrustrationPoint(frustrationToAdd);
 	}
 
 	monsterHitsWall(monster, wall) {
@@ -418,6 +426,43 @@ class GameState {
 			this.game.debug.body(this.player);
 		}
 	
+	}
+
+	// Just Fibonnacci Series with a loop
+	frustrationFactor() {
+		var a = 1, b = 0, temp;
+		let frustrationLevelTmp = this.frustrationLevel;
+		while ( frustrationLevelTmp >= 0){
+			temp = a;
+			a = a + b;
+			b = temp;
+			frustrationLevelTmp--;
+		}
+		
+		return b;
+	}
+
+	increaseFrustrationLevel() {
+		this.frustrationLevel++;
+		console.log("INCREASED frustration level to " + this.frustrationLevel );
+	}
+
+	increaseFrustrationPoint(point) {
+		this.frustrationScore += point;
+		console.log("ADDED " + point + " frustration points!");
+	}
+
+	decreaseFrustrationPoint(point) {
+		let newScore = this.frustrationScore - point;
+		this.frustrationScore = newScore < 0 ? 0 : newScore;
+		console.log("REMOVED " + point + " frustration points!");
+	}
+
+	frustrationTicker() {
+		this.totalMinute++;
+		this.increaseFrustrationLevel();
+		let frustrationToAdd = this.frustrationFactor() * ( TIME_HIT + this.totalMinute );
+		this.increaseFrustrationPoint(frustrationToAdd);
 	}
 }
 

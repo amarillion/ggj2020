@@ -9,6 +9,12 @@ export const BODY_H = 12;
 export const BODY_LEFT = 2;
 export const BODY_TOP = 2;
 
+export const MONSTER_HIT = 3;
+export const TIME_HIT = 1;
+export const KEY_GAIN = 3;
+export const DOOR_GAIN = 4;
+export const LEVEL_GAIN = 10;
+
 /*
 // placeholder graphics
 export const WALL_TILE = 0;
