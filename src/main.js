@@ -240,6 +240,7 @@ class GameState {
 
 	initMonsters() {
 		let count = this.levelConfig['enemyCount'];
+		let speedFactor = this.levelConfig['enemySpeedFactor'];
 		for (let i = 0; i < count; i++ ) {
 			let newMonster = this.monsters.create(0, 0, SPRITESHEET, ENEMY_TILE);
 			newMonster.animations.add('idle', [ 0x10, 0x11, 0x12 ], 3, true);
@@ -270,20 +271,20 @@ class GameState {
 			let randomNumber = Math.floor((Math.random() * 4) + 1);
 			switch (randomNumber) {
 				case 1:
-					newMonster.body.velocity.x = UNIT/10;
-					newMonster.body.velocity.y = UNIT/10;
+					newMonster.body.velocity.x = UNIT/10 * speedFactor;
+					newMonster.body.velocity.y = UNIT/10 * speedFactor;
 					break;
 				case 2:
-					newMonster.body.velocity.x = -UNIT/10;
-					newMonster.body.velocity.y = UNIT/10;
+					newMonster.body.velocity.x = -UNIT/10 * speedFactor;
+					newMonster.body.velocity.y = UNIT/10 * speedFactor;
 					break;
 				case 3:
-					newMonster.body.velocity.x = UNIT/10;
-					newMonster.body.velocity.y = -UNIT/10;
+					newMonster.body.velocity.x = UNIT/10 * speedFactor;
+					newMonster.body.velocity.y = -UNIT/10 * speedFactor;
 					break;
 				case 4:
-					newMonster.body.velocity.x = -UNIT/10;
-					newMonster.body.velocity.y = -UNIT/10;
+					newMonster.body.velocity.x = -UNIT/10 * speedFactor;
+					newMonster.body.velocity.y = -UNIT/10 * speedFactor;
 					break;
 				default:
 					break;
