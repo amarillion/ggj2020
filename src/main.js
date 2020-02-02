@@ -112,6 +112,8 @@ class GameState {
 
 		let playerTile;
 
+		this.emptyTilesCoordinates = [];
+
 		// extract player, target and and enemy locations
 		for (let x = 0; x < map.width; ++x) {
 			for (let y = 0; y < map.height; ++y) {
@@ -127,6 +129,7 @@ class GameState {
 						map.putTile(EMPTY_TILE, x, y);
 						break;
 					case EMPTY_TILE: // open area
+						this.emptyTilesCoordinates.push({ 'x': tile.worldX, 'y': tile.worldY });
 						break;
 					case DOOR_TILE: // door closed
 					case DOOR2_TILE: // door closed
@@ -236,10 +239,9 @@ class GameState {
 	}
 
 	initMonsters() {
-		let count = 5;
+		let count = this.levelConfig['enemyCount'];
 		for (let i = 0; i < count; i++ ) {
-			//let newMonster = this.game.add.sprite(100, 110, SPRITESHEET, 5);
-			let newMonster = this.monsters.create(100, 110, SPRITESHEET, ENEMY_TILE);
+			let newMonster = this.monsters.create(0, 0, SPRITESHEET, ENEMY_TILE);
 			newMonster.animations.add('idle', [ 0x10, 0x11, 0x12 ], 3, true);
 			newMonster.animations.add('walk', [ 0x13, 0x14 ], 2, true);
 			newMonster.animations.play('walk');
@@ -252,6 +254,19 @@ class GameState {
 			//  This adjusts the collision body size.
 			newMonster.body.setSize(BODY_W, BODY_H, BODY_LEFT, BODY_TOP);
 			newMonster.body.bounce.set(1);
+
+
+			let numberOfEmptyTiles = this.emptyTilesCoordinates.length;
+			let coordinate = this.emptyTilesCoordinates[Math.floor(Math.random()*numberOfEmptyTiles)];
+			let spawnPointX = coordinate.x/GAME_SCALE + BODY_W/2;
+			let spawnPointY = coordinate.y/GAME_SCALE + BODY_W/2;
+
+			newMonster.position.setTo(
+				spawnPointX,
+				spawnPointY
+			);
+
+
 			let randomNumber = Math.floor((Math.random() * 4) + 1);
 			switch (randomNumber) {
 				case 1:
