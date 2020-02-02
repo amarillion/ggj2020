@@ -38,7 +38,7 @@ class Game extends Phaser.Game {
 const TILES_IMG = "sprites1";
 const SPRITESHEET = "sprites2";
 
-const UNIT = 64 * GAME_SCALE; // size of the square tiles in pixels
+const UNIT = 128 * GAME_SCALE; // size of the square tiles in pixels
 
 class GameState {
 	
