@@ -296,8 +296,10 @@ class GameState {
 
 		this.clearLevel();
 		this.game.data.currentLevel += 1;
-		this.levelConfig = levelData[this.game.data.currentLevel]; 
-		this.initLevel(); // initialize next level again
+		this.levelConfig = levelData[this.game.data.currentLevel];
+		this.music.stop();
+		this.state.start("IntroState", true, false, this.levelConfig.introText, "GameState");
+		// this.initLevel(); // initialize next level again
 	}
 
 	update() {

@@ -1,4 +1,4 @@
-import { lipsumText } from "./IntroState";
+import { levelData } from "./level";
 
 const creditsText = `"You can't repair bad"
 (by the QA team of Doom)
@@ -40,8 +40,8 @@ export default class {
 		newGame.inputEnabled = true;
 		entryPosition += 60;
 
-		newGame.events.onInputDown.add(() => this.state.start("IntroState", true, false, lipsumText, "GameState"));
-
+		newGame.events.onInputDown.add(() => this.state.start("IntroState", true, false, 
+			levelData[0].introText, "GameState"));
 
 		var credits = this.game.add.text(menuPositionX, menuPositionY + entryPosition, 'Credits', GENERAL_STYLE);
 		credits.inputEnabled = true;

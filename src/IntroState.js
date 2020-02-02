@@ -2,9 +2,6 @@
 
 const INTRO_STYLE = {font: "32px pixelFont", fill: "#FD88D5", align: "left"};
 
-export const lipsumText = 
-	"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-
 export default class {
 	/**
 	 * @param {String} displayText The lookup key of the text that's going to be displayed next time you switch to this state.
@@ -35,7 +32,7 @@ export default class {
 		this.text.wordWrap = true;
 		this.text.wordWrapWidth = this.w;
 
-		this.game.time.events.add(Phaser.Timer.SECOND * 3, () => this.state.start(this.nextState));
+		this.game.time.events.add(Phaser.Timer.SECOND * 4, () => this.state.start(this.nextState));
 
 	}
 }

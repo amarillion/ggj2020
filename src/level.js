@@ -22,10 +22,9 @@ export const levelData = [
 		doorFunc: addDoors1,
 		enemyCount: 3,
 		introText: `Well, that was easy.
-		Keys open same color doors. WHAT CREATIVE DESIGN!
+Keys open same color doors. WHAT CREATIVE DESIGN!
 
-		When the game is broken, I can access debug tools with ENTER or TAB
-		`,
+And when the game is broken, I can always access debug tools with ENTER or TAB`,
 	},
 	// 2
 	{
@@ -34,8 +33,7 @@ export const levelData = [
 		doorFunc: addDoors1,
 		enemyCount: 5,
 		introText: `Seriously? They can’t even match keys with doors?
-		Feels like they don’t even care about QA team. I mean, me.
-		`,
+Feels like they don’t even care about QA team. I mean, me.`,
 	},
 	// 3
 	{
@@ -44,8 +42,7 @@ export const levelData = [
 		doorFunc: addDoors2,
 		enemyCount: 8,
 		introText: `Wrong keys and doors, now in THREE COLORS!
-		Maybe it was just the first levels that are buggy. Pretty please?
-		`,
+Maybe it was just the first levels that are buggy. Pretty please?`,
 	},
 	// 4
 	{
@@ -54,8 +51,7 @@ export const levelData = [
 		doorFunc: addDoors2,
 		enemyCount: 10,
 		introText: `Why am I here? Really. Why. Am. I. Here.
-		I’m gonna quit after the next one if it’s broken too.
-		`,
+I’m gonna quit after the next one if it’s broken too.`,
 	},
 	// 5
 	{
@@ -63,8 +59,7 @@ export const levelData = [
 		enemySpeedFactor: 1.2,
 		doorFunc: addDoors2,
 		enemyCount: 12,
-		introText: `I’m DEFINITELY gonna quit if THIS one is broken.
-		`,
+		introText: `I’m DEFINITELY gonna quit if THIS one is broken.`,
 	},
 	// 6
 	{
@@ -73,8 +68,7 @@ export const levelData = [
 		doorFunc: addDoors2,
 		enemyCount: 14,
 		introText: `Do they even try? And why can’t I just disable monsters or something?
-		Can I even fix this thing? I mean, the game is just bad.
-		`,
+Can I even fix this thing? I mean, the game is just bad.`,
 	},
 	// 7
 	{
@@ -83,8 +77,7 @@ export const levelData = [
 		doorFunc: addDoors2,
 		enemyCount: 16,
 		introText: `Looking for “Passionate” colleagues, they said. Grow your skills, they said.
-		No one told me about modern servitude and endless fixing.
-		`,
+No one told me about modern servitude and endless fixing.`,
 	},
 	// 8
 	{
@@ -92,8 +85,8 @@ export const levelData = [
 		enemySpeedFactor: 1.4,
 		doorFunc: addDoors2,
 		enemyCount: 18,
-		introText: `I could have learned something else. Like, ANYTHING ELSE. Nope, here I am, testing the latest GROUND BREAKING game for SLECHT SOFT. In their defense, the name was an obvious give-away.
-		`,
+		introText: `I could have learned something else. Like, ANYTHING ELSE. Nope, here I am, testing the latest GROUND BREAKING game for SLECHT SOFT. 
+In their defense, the name was an obvious give-away.`,
 	},
 	// 9
 	{
@@ -101,8 +94,8 @@ export const levelData = [
 		enemySpeedFactor: 1.5,
 		doorFunc: addDoors2,
 		enemyCount: 20,
-		introText: `What if like, a meteor fell on the city and the powerline was gone and I couldn’t work. Or maybe a zombie apocalypse? Oooh, I could totally be a sarcastic guy with a barbed bat.
-		`,
+		introText: `What if like, a meteor fell on the city and the powerline was gone and I couldn’t work. Or maybe a zombie apocalypse? 
+Oooh, I could totally be a sarcastic guy with a barbed bat.`,
 	},
 	// 10
 	{
@@ -110,8 +103,8 @@ export const levelData = [
 		enemySpeedFactor: 1.5,
 		doorFunc: addDoors2,
 		enemyCount: 22,
-		introText: `Who am I kidding, if there was a zombie apocalypse I’d die the first day. So not zombie apocalypse. What if we cloned dinosaurs and life... uhm... found a way?
-		`,
+		introText: `Who am I kidding, if there was a zombie apocalypse I’d die the first day. So not zombie apocalypse. 
+What if we cloned dinosaurs and life... uhm... found a way?`,
 	},
 	// 11
 	{
