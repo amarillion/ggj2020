@@ -15,8 +15,7 @@ import {
 	START_TILE, EMPTY_TILE, GOAL_TILE, ENEMY_TILE, 
 	TILE_WIDTH, TILE_HEIGHT, NUM_TILES, BODY_H, BODY_LEFT, BODY_TOP, BODY_W,
 	MONSTER_HIT, TIME_HIT, KEY_GAIN, DOOR_GAIN, LEVEL_GAIN, // frustration related
-	DEBUG_HIT,
-	AUDIO_VOLUME
+	DEBUG_HIT, AUDIO_VOLUME, YELLOW, RED, BLUE
 } from './constants';
 
 import MenuState from './MenuState';
@@ -103,8 +102,7 @@ class GameState {
 			if (this.dialogs.hasActiveDialog()) {
 				this.dialogs.spacePressed();
 				this.sfx['sfx_menu2'].play();
-				let frustrationToAdd = this.frustrationFactor() * DEBUG_HIT;
-				this.increaseFrustrationPoint(frustrationToAdd);
+				this.increaseFrustrationPoint(DEBUG_HIT);
 			}
 		}, this);
 
@@ -277,10 +275,20 @@ class GameState {
 		this.levelText.fixedToCamera = true;
 		this.frustrationText = this.game.add.text(16, 56, 'Frustration x' + this.frustrationLevel +': ' + this.frustrationScore, { fontSize: '32px', fill: '#FFF', stroke: '#000000', strokeThickness: 6 });
 		this.frustrationText.fixedToCamera = true;
+
+		this.redKeyText = this.game.add.text(16, 96, 'Red keys: 0', { fontSize: '24px', fill: '#E00', stroke: '#000000', strokeThickness: 6 });
+		this.redKeyText.fixedToCamera = true;
+		this.yellowKeyText = this.game.add.text(16, 128, 'Yellow keys: 0', { fontSize: '24px', fill: '#FE2', stroke: '#000000', strokeThickness: 6 });
+		this.yellowKeyText.fixedToCamera = true;
+		this.blueKeyText = this.game.add.text(16, 160, 'Blue keys: 0', { fontSize: '24px', fill: '#71F', stroke: '#000000', strokeThickness: 6 });
+		this.blueKeyText.fixedToCamera = true;
 	}
 
 	updateText() {
 		this.levelText.text = 'Level: ' + (this.currentLevel + 1);
+		this.redKeyText.text =  'Red keys: ' + (this.collectedKeys[RED] || 0);
+		this.yellowKeyText.text = 'Yellow keys: ' + (this.collectedKeys[YELLOW] || 0);
+		this.blueKeyText.text = 'Blue keys: ' + (this.collectedKeys[BLUE] || 0);
 		this.frustrationText.text = 'Frustration x' + this.frustrationLevel +': ' + this.frustrationScore;
 	}
 
@@ -391,13 +399,10 @@ class GameState {
 			this.nextLevel();
 		} else if ( wall.properties['is_closed_door'] ) {
 			let index = wall.index;
-			console.log("Index is: " + index);
-			console.log(this.doorsAndKeys);
 			if ( index in this.doorsAndKeys ) {
 				let requiredKeyBefore = this.doorsAndKeys[index]['requiredKey'];
 				let requiredKey = this.keyManager.getKeyNeededForDoor(requiredKeyBefore);
 
-				console.log("Required Key: " + requiredKey);
 				if ( requiredKey && this.collectedKeys[requiredKey] ) {
 					this.collectedKeys[requiredKey] -= 1;
 					wall.properties['is_closed_door'] = false;
@@ -408,6 +413,7 @@ class GameState {
 					// Unlocked!
 					this.decreaseFrustrationPoint(DOOR_GAIN);
 					this.sfx.sfx_unlock.play();
+					this.updateText();
 				}
 
 			}
@@ -424,6 +430,7 @@ class GameState {
 		key.kill();
 		this.decreaseFrustrationPoint(KEY_GAIN);
 		this.sfx.sfx_key2.play();
+		this.updateText();
 	}
 
 	playerHitsMonster(player, monster) {
@@ -454,6 +461,7 @@ class GameState {
 		this.game.time.events.add(Phaser.Timer.SECOND * 2, () => {
 			this.music.play();
 			this.resetLevel();
+			this.updateText();
 			this.playerAlreadyDead = false;
 		});
 	}
