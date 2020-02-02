@@ -259,6 +259,16 @@ class GameState {
 		this.player.body.setSize(BODY_W, BODY_H, BODY_LEFT, BODY_TOP);
 
 		this.game.camera.follow(this.player);
+
+		this.levelText = this.game.add.text(16, 16, 'Level: ' + (this.currentLevel + 1), { fontSize: '32px', fill: '#FFF', stroke: '#000000', strokeThickness: 6 });
+		this.levelText.fixedToCamera = true;
+		this.frustrationText = this.game.add.text(16, 56, 'Frustration x' + this.frustrationLevel +': ' + this.frustrationScore, { fontSize: '32px', fill: '#FFF', stroke: '#000000', strokeThickness: 6 });
+		this.frustrationText.fixedToCamera = true;
+	}
+
+	updateText() {
+		this.levelText.text = 'Level: ' + (this.currentLevel + 1);
+		this.frustrationText.text = 'Frustration x' + this.frustrationLevel +': ' + this.frustrationScore;
 	}
 
 	clearLevel() {
@@ -279,29 +289,26 @@ class GameState {
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
 
-		if (this.uiBlocked) {
-			return;
-		}
+		if (!this.uiBlocked) {
+			if (this.cursors.left.isDown)
+			{
+				this.player.body.velocity.x = -UNIT;
+			}
+			if (this.cursors.right.isDown)
+			{
+				this.player.body.velocity.x = UNIT;
+			}
 
-		if (this.cursors.left.isDown)
-		{
-			this.player.body.velocity.x = -UNIT;
-		}
-		if (this.cursors.right.isDown)
-		{
-			this.player.body.velocity.x = UNIT;
-		}
+			if (this.cursors.up.isDown)
+			{
+				this.player.body.velocity.y = -UNIT;
+			}
 
-		if (this.cursors.up.isDown)
-		{
-			this.player.body.velocity.y = -UNIT;
+			if (this.cursors.down.isDown)
+			{
+				this.player.body.velocity.y = UNIT;
+			}
 		}
-
-		if (this.cursors.down.isDown)
-		{
-			this.player.body.velocity.y = UNIT;
-		}
-
 
 		this.game.physics.arcade.collide(this.player, this.l1, this.playerHitsWall, null, this);
 		this.game.physics.arcade.collide(this.player, this.monsters, this.playerHitsMonster, null, this);
@@ -337,7 +344,6 @@ class GameState {
 				spawnPointX,
 				spawnPointY
 			);
-
 
 			let randomNumber = Math.floor((Math.random() * 4) + 1);
 			switch (randomNumber) {
@@ -460,17 +466,20 @@ class GameState {
 
 	increaseFrustrationLevel() {
 		this.frustrationLevel++;
+		this.updateText();
 		console.log("INCREASED frustration level to " + this.frustrationLevel );
 	}
 
 	increaseFrustrationPoint(point) {
 		this.frustrationScore += point;
+		this.updateText();
 		console.log("ADDED " + point + " frustration points!");
 	}
 
 	decreaseFrustrationPoint(point) {
 		let newScore = this.frustrationScore - point;
 		this.frustrationScore = newScore < 0 ? 0 : newScore;
+		this.updateText();
 		console.log("REMOVED " + point + " frustration points!");
 	}
 
