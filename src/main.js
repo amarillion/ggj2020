@@ -403,6 +403,7 @@ class GameState {
 		this.increaseFrustrationLevel();
 		let frustrationToAdd = this.frustrationFactor() * MONSTER_HIT;
 		this.increaseFrustrationPoint(frustrationToAdd);
+		this.resetLevel();
 	}
 
 	monsterHitsWall(monster, wall) {
