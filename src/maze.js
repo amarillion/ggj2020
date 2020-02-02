@@ -453,29 +453,51 @@ const YELLOW = 3;
 const BLUE = 4;
 
 export function addDoors1(grid) {
+	const [ , key2, key3 ] = shuffle([ RED, BLUE, YELLOW ]);
+
 	const allNodes = grid.allNodes();
 	const randomPivot = pickOne(allNodes);
-	const [ a, b ] = splitMaze(randomPivot, RED);
-	const [ aa, ab ] = splitMaze(a, BLUE); // aa is linked to a. ab is linked to aa
+	const [ a, b ] = splitMaze(randomPivot, key2);
+	const [ aa, ab ] = splitMaze(a, key3); // aa is linked to a. ab is linked to aa
 	makeStart(expandNodes(b));
-	dropKey(expandNodes(b), RED);
-	dropKey(expandNodes(aa), BLUE);
+	dropKey(expandNodes(b), key2);
+	dropKey(expandNodes(aa), key3);
 	makeGoal(expandNodes(ab));
 }
 
+// Fisher-Yates shuffle
+export function shuffle(array) {
+	
+	let counter = array.length;
+
+	// While there are elements in the array
+	while (counter > 0) {
+		let index = randomNumber(counter);
+		counter--;
+
+		// And swap the last element with it
+		let temp = array[counter];
+		array[counter] = array[index];
+		array[index] = temp;
+	}
+
+	return array;
+}
+
 export function addDoors2(grid) {
+	const [ key1, key2, key3 ] = shuffle([ RED, BLUE, YELLOW ]);
+	
 	const allNodes = grid.allNodes();
 	const randomPivot = pickOne(allNodes);
-	const [ a, b ] = splitMaze(randomPivot, RED);
-	const [ aa, ab ] = splitMaze(a, BLUE); // aa is linked to a. ab is linked to aa
-	const [ ba, bb ] = splitMaze(b, YELLOW); // ba is linked to aa. bb is linked to ba
+	const [ a, b ] = splitMaze(randomPivot, key1);
+	const [ aa, ab ] = splitMaze(a, key3); // aa is linked to a. ab is linked to aa
+	const [ ba, bb ] = splitMaze(b, key2); // ba is linked to aa. bb is linked to ba
 	
 	// ab <-> aa <-> ba <-> bb
-
 	makeStart(expandNodes(ba));
-	dropKey(expandNodes(ba), YELLOW);
-	dropKey(expandNodes(bb), RED);
-	dropKey(expandNodes(aa), BLUE);
+	dropKey(expandNodes(ba), key2);
+	dropKey(expandNodes(bb), key1);
+	dropKey(expandNodes(aa), key3);
 	makeGoal(expandNodes(ab));
 }
 /*
