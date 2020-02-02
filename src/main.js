@@ -143,15 +143,24 @@ class GameState {
 	}
 
 	initLevel() {
-		const grid = genMazeAndAddDoors(this.levelConfig.w, this.levelConfig.h, this.levelConfig.doorFunc);
+		this.grid = genMazeAndAddDoors(this.levelConfig.w, this.levelConfig.h, this.levelConfig.doorFunc);
+		this.refreshLevel();
+	}
 
+	resetLevel() {
+		this.clearLevel();
+		// keep same grid as before
+		this.refreshLevel();
+	}
+
+	refreshLevel() {
 		// create a tilemap
 		this.map = this.game.add.tilemap();
 		this.map.setTileSize(TILE_WIDTH, TILE_HEIGHT);
 		this.map.addTilesetImage(TILES_IMG);
 		const map = this.map;
 
-		this.l1 = grid.convertToMap(this.map);
+		this.l1 = this.grid.convertToMap(this.map);
 
 		// l1.setScale works. l1.scale.setTo(2) disables collision!
 		// see https://github.com/photonstorm/phaser/issues/2305
