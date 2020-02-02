@@ -70,17 +70,10 @@ class GameState {
 		};
 	}
 
-	preload() {		
-		this.load.image(TILES_IMG, "assets/sprites.png");
-		this.load.spritesheet(SPRITESHEET, "assets/sprites.png", TILE_WIDTH, TILE_HEIGHT, NUM_TILES);
-		this.load.tilemap("level", "assets/placeholder-level.json", null, Phaser.Tilemap.TILED_JSON);
-		this.load.audio('mainSoundtrack', ['assets/music.mp3', 'assets/music.ogg']);
-		this.cursors = this.game.input.keyboard.createCursorKeys();
-	}
-
 	// called everytime state is entered
 	create () {
 		console.log("GameState.create");
+		this.cursors = this.game.input.keyboard.createCursorKeys();
 		this.game.stage.smoothed = false; // disable antialiasing
 
 		this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -497,10 +490,26 @@ class GameState {
 	}
 }
 
+class BootState {
+
+	preload() {		
+		this.load.image(TILES_IMG, "assets/sprites.png");
+		this.load.image("menubg", "assets/menubg.png");
+		this.load.spritesheet(SPRITESHEET, "assets/sprites.png", TILE_WIDTH, TILE_HEIGHT, NUM_TILES);
+		this.load.tilemap("level", "assets/placeholder-level.json", null, Phaser.Tilemap.TILED_JSON);
+		this.load.audio('mainSoundtrack', ['assets/music.mp3', 'assets/music.ogg']);
+	}
+
+	create() {
+		this.state.start("MenuState");
+	}
+}
+
 window.onload = () => {
 	const game = new Game();
+	game.state.add("BootState", BootState);
 	game.state.add("MenuState", MenuState);
 	game.state.add("IntroState", IntroState);
 	game.state.add("GameState", GameState);
-	game.state.start("MenuState");
+	game.state.start("BootState");
 };
