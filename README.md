@@ -1,4 +1,5 @@
-# Global Game Jam 2020
+# You can't repair bad
+(By the QA team of doom)
 
 This project was created for the Global Game Jam 2020.
 

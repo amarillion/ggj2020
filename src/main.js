@@ -436,15 +436,19 @@ class GameState {
 
 		this.music.stop();
 
+		// prevent monster from flying away
+		monster.body.velocity.x = 0;
+		monster.body.velocity.y = 0;
+
 		const soundKey = pickOne(['sfx_dmg1',
-		'sfx_dmg2',
-		'sfx_dmg3',
-		'sfx_dmg4',
-		'sfx_dmg5',
-		'sfx_dmg6',
-		'sfx_dmg7',
-		'sfx_dmg8',
-		'sfx_dmg9']);
+			'sfx_dmg2',
+			'sfx_dmg3',
+			'sfx_dmg4',
+			'sfx_dmg5',
+			'sfx_dmg6',
+			'sfx_dmg7',
+			'sfx_dmg8',
+			'sfx_dmg9']);
 		this.sfx[soundKey].play();
 
 		this.game.time.events.add(Phaser.Timer.SECOND * 2, () => {
@@ -534,30 +538,30 @@ class BootState {
 		this.load.image("menubg", "assets/menubg.png");
 		this.load.spritesheet(SPRITESHEET, "assets/sprites.png", TILE_WIDTH, TILE_HEIGHT, NUM_TILES);
 		this.load.tilemap("level", "assets/placeholder-level.json", null, Phaser.Tilemap.TILED_JSON);
-		this.load.audio('mainSoundtrack', 'assets/music.ogg');
-		this.load.audio('altSoundtrack', 'assets/music_alternate.ogg');
-		this.load.audio('sfx_dmg1', 'assets/sfx/Damage 3 Ow.ogg');
-		this.load.audio('sfx_dmg2', 'assets/sfx/Damage 6 Death-Why Me.ogg');
-		this.load.audio('sfx_dmg3', 'assets/sfx/Damage 8 That Hurt.ogg');
-		this.load.audio('sfx_dmg4', 'assets/sfx/Damage 5 Death-I Just Got Tinder!.ogg');
-		this.load.audio('sfx_dmg5', 'assets/sfx/Damage 7 Ow 2.ogg');
-		this.load.audio('sfx_dmg6', 'assets/sfx/Damage 2 Stop It!.ogg');
-		this.load.audio('sfx_dmg7', 'assets/sfx/Damage 4 Death-My Mortgage!.ogg');
-		this.load.audio('sfx_dmg8', 'assets/sfx/Damage 9 Oh Man.ogg');
-		this.load.audio('sfx_dmg9', 'assets/sfx/Damage 1 Ouch.ogg');
-		this.load.audio('sfx_menu1', 'assets/sfx/Menu manipulation sound 1.ogg');
-		this.load.audio('sfx_menu2', 'assets/sfx/Menu manipulation sound 2.ogg');
-		this.load.audio('sfx_menu3', 'assets/sfx/Menu manipulation sound 3.ogg');
-		this.load.audio('sfx_menu4', 'assets/sfx/Debug transition enter.ogg');
-		this.load.audio('sfx_menu5', 'assets/sfx/Debug transition exit.ogg');
-		this.load.audio('sfx_foot1', 'assets/sfx/Footsteps double.ogg');
-		this.load.audio('sfx_foot2', 'assets/sfx/Footsteps single.ogg');
-		this.load.audio('sfx_vic1', 'assets/sfx/Victory 1.ogg');
-		this.load.audio('sfx_vic2', 'assets/sfx/Victory 2.ogg');
-		this.load.audio('sfx_unlock', 'assets/sfx/Door unlock.ogg');
-		this.load.audio('sfx_key1', 'assets/sfx/Pick up key 1.ogg');
-		this.load.audio('sfx_key2', 'assets/sfx/Pick up key 2.1.ogg');
-		this.load.audio('sfx_key3', 'assets/sfx/Pick up key 2.ogg');
+		this.load.audio('mainSoundtrack', [ 'assets/music.ogg', 'assets/music.mp3' ]);
+		this.load.audio('altSoundtrack', [ 'assets/music_alternate.ogg', 'assets/music_alternate.mp3' ]);
+		this.load.audio('sfx_dmg1',  ['assets/sfx/Damage 3 Ow.ogg', 'assets/sfx/Damage 3 Ow.mp3']);
+		this.load.audio('sfx_dmg2',  ['assets/sfx/Damage 6 Death-Why Me.ogg', 'assets/sfx/Damage 6 Death-Why Me.mp3']);
+		this.load.audio('sfx_dmg3',  ['assets/sfx/Damage 8 That Hurt.ogg', 'assets/sfx/Damage 8 That Hurt.mp3']);
+		this.load.audio('sfx_dmg4',  ['assets/sfx/Damage 5 Death-I Just Got Tinder!.ogg', 'assets/sfx/Damage 5 Death-I Just Got Tinder!.mp3']);
+		this.load.audio('sfx_dmg5',  ['assets/sfx/Damage 7 Ow 2.ogg', 'assets/sfx/Damage 7 Ow 2.mp3']);
+		this.load.audio('sfx_dmg6',  ['assets/sfx/Damage 2 Stop It!.ogg', 'assets/sfx/Damage 2 Stop It!.mp3']);
+		this.load.audio('sfx_dmg7',  ['assets/sfx/Damage 4 Death-My Mortgage!.ogg', 'assets/sfx/Damage 4 Death-My Mortgage!.mp3']);
+		this.load.audio('sfx_dmg8',  ['assets/sfx/Damage 9 Oh Man.ogg', 'assets/sfx/Damage 9 Oh Man.mp3']);
+		this.load.audio('sfx_dmg9',  ['assets/sfx/Damage 1 Ouch.ogg', 'assets/sfx/Damage 1 Ouch.mp3']);
+		this.load.audio('sfx_menu1', ['assets/sfx/Menu manipulation sound 1.ogg', 'assets/sfx/Menu manipulation sound 1.mp3']);
+		this.load.audio('sfx_menu2', ['assets/sfx/Menu manipulation sound 2.ogg', 'assets/sfx/Menu manipulation sound 2.mp3']);
+		this.load.audio('sfx_menu3', ['assets/sfx/Menu manipulation sound 3.ogg', 'assets/sfx/Menu manipulation sound 3.mp3']);
+		this.load.audio('sfx_menu4', ['assets/sfx/Debug transition enter.ogg', 'assets/sfx/Debug transition enter.mp3']);
+		this.load.audio('sfx_menu5', ['assets/sfx/Debug transition exit.ogg', 'assets/sfx/Debug transition exit.mp3']);
+		this.load.audio('sfx_foot1', ['assets/sfx/Footsteps double.ogg', 'assets/sfx/Footsteps double.mp3']);
+		this.load.audio('sfx_foot2', ['assets/sfx/Footsteps single.ogg', 'assets/sfx/Footsteps single.mp3']);
+		this.load.audio('sfx_vic1',  ['assets/sfx/Victory 1.ogg', 'assets/sfx/Victory 1.mp3']);
+		this.load.audio('sfx_vic2',  ['assets/sfx/Victory 2.ogg', 'assets/sfx/Victory 2.mp3']);
+		this.load.audio('sfx_unlock',['assets/sfx/Door unlock.ogg', 'assets/sfx/Door unlock.mp3']);
+		this.load.audio('sfx_key1',  ['assets/sfx/Pick up key 1.ogg', 'assets/sfx/Pick up key 1.mp3']);
+		this.load.audio('sfx_key2',  ['assets/sfx/Pick up key 2.1.ogg', 'assets/sfx/Pick up key 2.1.mp3']);
+		this.load.audio('sfx_key3',  ['assets/sfx/Pick up key 2.ogg', 'assets/sfx/Pick up key 2.mp3']);
 	}
 
 	create() {

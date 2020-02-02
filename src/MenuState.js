@@ -1,6 +1,7 @@
 import { lipsumText } from "./IntroState";
 
-const creditsText = `Game created for Global Game Jam 2020 in 48 hours
+const creditsText = `"You can't repair bad"
+(by the QA team of Doom)
 
 A. B. "C" Gokhan (Graphical Design)
 Ekrem "Secret weapon" Atamer (Graphical Design, Voice, Lore)
@@ -8,6 +9,7 @@ Gökçe "SUPERDAZE" Özaydın (Music, SFX, Trailer, Voice)
 Kerem "Elvendor" Gokhan (Coding)
 Martijn "Amarillion" van Iersel (Coding)
 
+Game created for Global Game Jam 2020 in 48 hours
 Find the code on http://github.com/amarillion/ggj2020/
 `;
 
