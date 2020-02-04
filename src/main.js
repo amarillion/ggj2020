@@ -519,7 +519,12 @@ class GameState {
 		this.updateText();
 		
 		if (this.game.data.frustrationScore > 100) {
-			this.state.start("IntroState", true, false, "GAME OVER", "MenuState");
+			this.state.start("IntroState", true, false, `  -- GAME OVER --
+
+Your frustration reached ${this.frustrationScore}.
+
+You quit your job in a huff!
+`, "MenuState");
 		}
 
 		console.log("ADDED " + point + " frustration points!");
