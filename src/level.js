@@ -24,7 +24,7 @@ export const levelData = [
 		introText: `Well, that was easy.
 Keys open same color doors. WHAT CREATIVE DESIGN!
 
-And when the game is broken, I can always access debug tools with ENTER or TAB`,
+And when the game is broken, I can always access debug tools with ENTER or TAB, and change things with SPACEBAR`,
 	},
 	// 2
 	{
