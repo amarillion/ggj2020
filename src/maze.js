@@ -71,21 +71,12 @@ export class Cell {
 	}
 
 	listNeighbors() {
-		const result = [];
-		for (const [k, v] of Object.entries(this.links)) {
-			result.push({ dir: k, cell : v });
-		}
-		return result;
+		return Object.entries(this.links);
 	}
 
 	nonDoorLinks() {
-		const result = [];
-		for (const [k, v] of Object.entries(this.links)) {
-			if (this.linkTypes[k] === 1) {
-				result.push({ dir: k, cell : v });
-			}
-		}
-		return result;
+		return Object.entries(this.links).
+			filter(([dir,]) => this.linkTypes[dir] === 1);
 	}
 }
 
@@ -136,7 +127,7 @@ export class Grid {
 		const result = [];
 		for (const dirKey of [NORTH, EAST, SOUTH, WEST]) {
 			const n = this.findNeighbor(cell, dirKey);
-			if (n) result.push( { dir: dirKey, cell : n });
+			if (n) result.push( [ dirKey, n ]);
 		}
 		return result;
 	}
@@ -278,16 +269,17 @@ export function binaryTree(grid) {
 		const neighbors = [];
 		
 		const north = grid.findNeighbor(cell, NORTH);
-		if (north) neighbors.push({ dir: NORTH, cell: north });
+		if (north) neighbors.push([ NORTH, north ]);
 		
 		const east = grid.findNeighbor(cell, EAST);
-		if (east) neighbors.push({ dir: EAST, cell: east });
+		if (east) neighbors.push([ EAST, east ]);
 		
 		const item = pickOne(neighbors);
 		if (item) { 
+			const [dir, node] = item;
 			// add door sometimes...
 			const linkType  = Math.random() > 0.95 ? 2 : 1;	
-			cell.link(item.cell, item.dir, true, linkType); 
+			cell.link(node, dir, true, linkType); 
 		}
 
 		// add key sometimes
@@ -315,18 +307,18 @@ export function recursiveBackTracker(grid) {
 	while (stack.length > 0) {
 		const current = stack[stack.length - 1];
 		const unvisitedNeighbors = grid.allNeighbors(current).filter(item => {
-			return (Object.entries(item.cell.links).length === 0);
+			return (Object.entries(item[1].links).length === 0);
 		});
 
 		if (unvisitedNeighbors.length === 0) {
 			stack.pop();
 		}
 		else {
-			const item = pickOne(unvisitedNeighbors);
+			const [dir, node] = pickOne(unvisitedNeighbors);
 			
 			let linkType = 1; // base
-			current.link(item.cell, item.dir, true, linkType);
-			stack.push(item.cell); 
+			current.link(node, dir, true, linkType);
+			stack.push(node); 
 		}
 	}
 }
@@ -365,13 +357,13 @@ function oldAddDoors(grid) {
 		}
 
 		const unvisitedNeighbors = current.listNeighbors().
-			filter(item => !visited.has(item.cell));
+			filter(([, node]) => !visited.has(node));
 
 		if (unvisitedNeighbors.length === 0) {
 			stack.pop();
 		}
 		else {
-			const item = pickOne(unvisitedNeighbors);
+			const [dir, node] = pickOne(unvisitedNeighbors);
 			
 			// add door sometimes...
 			
@@ -382,13 +374,12 @@ function oldAddDoors(grid) {
 					linkType = +availableKey;
 					keyState[availableKey] -= 1;
 
-					current.makeDoor(item.dir, linkType);
+					current.makeDoor(dir, linkType);
 				}
 			}
 
-			// current.link(item.cell, item.dir, true, linkType);
-			stack.push(item.cell);
-			visited.add(item.cell);
+			stack.push(node);
+			visited.add(node);
 		}
 	}
 }
@@ -548,11 +539,12 @@ export function expandNodes(node, listNeighbors) {
 		
 		// find unvisited neighbors
 		const unvisited = listNeighbors(current).
-			filter(item => !visited.has(item.cell));
+			map(([,node]) => node).
+			filter(node => !visited.has(node));
 
-		for (const item of unvisited) {
-			visited.add(item.cell);
-			stack.push(item.cell);
+		for (const node of unvisited) {
+			visited.add(node);
+			stack.push(node);
 		}
 	}
 
@@ -572,14 +564,15 @@ export function reachable(src, dest, listNeighbors) {
 		
 		// find unvisited neighbors
 		const unvisited = listNeighbors(current).
-			filter(item => !visited.has(item.cell));
+			map(([,node]) => node).
+			filter(node => !visited.has(node));
 
-		for (const item of unvisited) {
-			if (item.cell === dest) {
+		for (const node of unvisited) {
+			if (node === dest) {
 				return true; // found!
 			}
-			visited.add(item.cell);
-			stack.push(item.cell);
+			visited.add(node);
+			stack.push(node);
 		}
 	}
 
@@ -599,17 +592,17 @@ function splitMaze(pivot, keyType) {
 		if (links.length > 0) {
 			valid = true;
 			
-			const doorLink = pickOne(links);
+			const [ doorDir, doorCell ] = pickOne(links);
 			
 			// upgrade linkType
-			randomCell.makeDoor(doorLink.dir, keyType);
+			randomCell.makeDoor(doorDir, keyType);
 
 			if (reachable(randomCell, pivot, n => n.nonDoorLinks())) {
-				return [ randomCell, doorLink.cell ];
+				return [ randomCell, doorCell ];
 			}
 			else {
-				assert (reachable(doorLink.cell, pivot, n => n.nonDoorLinks()), "Something went wrong while making doors");
-				return [ doorLink.cell, randomCell ]; 
+				assert (reachable(doorCell, pivot, n => n.nonDoorLinks()), "Something went wrong while making doors");
+				return [ doorCell, randomCell ]; 
 			}
 		}
 		else {
