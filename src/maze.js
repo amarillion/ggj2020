@@ -98,6 +98,10 @@ export class Grid {
 		}
 	}
 
+	randomCell() {
+		return pickOne(this.data);
+	}
+
 	eachCell(f) {
 		for (const cell of this.data) {
 			f(cell);
@@ -299,9 +303,8 @@ export function pickOne(list) {
 	return list[idx];
 }
 
-export function recursiveBackTracker(grid) {
+export function recursiveBackTracker(start, grid) {
 	const stack = [];
-	const start = grid.get(randomNumber(grid.w), randomNumber(grid.h));
 	stack.push(start);
 
 	while (stack.length > 0) {
@@ -426,7 +429,7 @@ export function genMazeAndAddDoors(w, h, doorFunc = addDoors2) {
 	while(true) {
 		try {
 			const grid = new Grid(w, h);
-			recursiveBackTracker(grid);
+			recursiveBackTracker(grid.randomCell(), grid);
 			doorFunc(grid);
 			return grid;
 		}
