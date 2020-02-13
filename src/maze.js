@@ -102,6 +102,17 @@ export class Grid {
 		return pickOne(this.data);
 	}
 
+	recursiveBackTracker() {
+		recursiveBackTracker(
+			this.randomCell(), 
+			c => this.allNeighbors(c),
+			(src, dir, dest) => {
+				const linkType = 1; // open, no door
+				src.link(dest, dir, true, linkType);
+			}
+		);
+	}
+
 	eachCell(f) {
 		for (const cell of this.data) {
 			f(cell);
@@ -303,15 +314,19 @@ export function pickOne(list) {
 	return list[idx];
 }
 
-export function recursiveBackTracker(start, grid) {
+export function recursiveBackTracker(start, listAdjacent, linkNodes) {
+	assert(typeof(listAdjacent) === 'function');
+	assert(typeof(linkNodes) === 'function');
+	
 	const stack = [];
 	stack.push(start);
+	const visited = new Set();
+	visited.add(start);
 
 	while (stack.length > 0) {
 		const current = stack[stack.length - 1];
-		const unvisitedNeighbors = grid.allNeighbors(current).filter(item => {
-			return (Object.entries(item[1].links).length === 0);
-		});
+		const unvisitedNeighbors = listAdjacent(current).
+			filter(([, node]) => !visited.has(node));
 
 		if (unvisitedNeighbors.length === 0) {
 			stack.pop();
@@ -319,9 +334,9 @@ export function recursiveBackTracker(start, grid) {
 		else {
 			const [dir, node] = pickOne(unvisitedNeighbors);
 			
-			let linkType = 1; // base
-			current.link(node, dir, true, linkType);
+			linkNodes(current, dir, node);
 			stack.push(node); 
+			visited.add(node);
 		}
 	}
 }
@@ -429,7 +444,7 @@ export function genMazeAndAddDoors(w, h, doorFunc = addDoors2) {
 	while(true) {
 		try {
 			const grid = new Grid(w, h);
-			recursiveBackTracker(grid.randomCell(), grid);
+			grid.recursiveBackTracker();
 			doorFunc(grid);
 			return grid;
 		}
