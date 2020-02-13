@@ -6,7 +6,8 @@
 import 'expose-loader?PIXI!phaser-ce/build/custom/pixi.js';
 import 'expose-loader?p2!phaser-ce/build/custom/p2.js';
 import Phaser from 'expose-loader?Phaser!phaser-ce/build/custom/phaser-split.js';
-import { genMazeAndAddDoors, pickOne } from './maze';
+import { pickOne } from "@amarillion/helixgraph/src/random.js";
+import { genMazeAndAddDoors } from './maze.js';
 import { 
 	GAME_SCALE, WALL_TILE, 
 	KEY_TILE_BLUE, KEY_TILE_YELLOW, KEY_TILE_RED,

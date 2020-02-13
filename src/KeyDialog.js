@@ -1,5 +1,5 @@
 import { YELLOW, BLUE, RED, ALL_KEYS } from "./constants.js";
-import { shuffle } from "./maze.js";
+import { shuffle } from "@amarillion/helixgraph/src/random.js";
 
 const OPTION_STYLE = {font: "32px pixelFont", fill: '#00FFA5'};
 const NUM_KEYS = 3;

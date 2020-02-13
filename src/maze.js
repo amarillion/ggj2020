@@ -8,6 +8,7 @@ import {
 	ALL_KEYS
 } from "./constants";
 import { bfsGenerator } from "@amarillion/helixgraph/src/pathFinding.js";
+import { randomInt, pickOne, shuffle } from "@amarillion/helixgraph/src/random.js";
 
 /*
 Generate a maze
@@ -306,15 +307,6 @@ export function binaryTree(grid) {
 	
 }
 
-export function randomNumber(range) {
-	return Math.floor(Math.random() * range);
-}
-
-export function pickOne(list) {
-	const idx = randomNumber(list.length);
-	return list[idx];
-}
-
 export function recursiveBackTracker(start, listAdjacent, linkNodes) {
 	assert(typeof(listAdjacent) === 'function');
 	assert(typeof(linkNodes) === 'function');
@@ -349,7 +341,7 @@ function oldAddDoors(grid) {
 	const end = grid.get(grid.w-1, grid.h-1);
 	let start;
 	do {
-		start = grid.get(randomNumber(grid.w), randomNumber(grid.h));
+		start = grid.get(randomInt(grid.w), randomInt(grid.h));
 	} while (start === end);
 
 	stack.push(start);
@@ -369,7 +361,7 @@ function oldAddDoors(grid) {
 		
 		// add object sometimes.
 		if (Math.random() > 0.90) {
-			const key = randomNumber(3) + 2;
+			const key = randomInt(3) + 2;
 			keyState[key] += 1;
 			current.object = key;
 			console.log({keyState});
@@ -412,7 +404,7 @@ function applyToRandomCell(cells, isValid, apply) {
 		it--;
 		assert(it > 0, "Maximum iterations reached");
 	}
-	while (!isValid(randomCell))
+	while (!isValid(randomCell));
 	apply(randomCell);
 }
 
@@ -481,25 +473,6 @@ export function addDoors1(grid) {
 	dropKey(expandUntilDoors(b), key3);
 	dropKey(expandUntilDoors(aa), key2);
 	makeGoal(expandUntilDoors(ab));
-}
-
-// Fisher-Yates shuffle
-export function shuffle(array) {
-	
-	let counter = array.length;
-
-	// While there are elements in the array
-	while (counter > 0) {
-		let index = randomNumber(counter);
-		counter--;
-
-		// And swap the last element with it
-		let temp = array[counter];
-		array[counter] = array[index];
-		array[index] = temp;
-	}
-
-	return array;
 }
 
 // only possible by changing mapping
