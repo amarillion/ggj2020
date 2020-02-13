@@ -446,18 +446,19 @@ export function genMazeAndAddDoors(w, h, doorFunc = addDoors2) {
 	}
 }
 
+const expandUntilDoors = (cells) => expandNodes(cells, n => n.nonDoorLinks());
+	
 // possible with regular mapping
 export function addDoors0(grid) {
 	const [ , key2, key3 ] = shuffle(ALL_KEYS);
-
 	const allNodes = grid.allNodes();
 	const randomPivot = pickOne(allNodes);
 	const [ a, b ] = splitMaze(randomPivot, key2);
 	const [ aa, ab ] = splitMaze(a, key3); // aa is linked to a. ab is linked to aa
-	makeStart(expandNodes(b));
-	dropKey(expandNodes(b), key2);
-	dropKey(expandNodes(aa), key3);
-	makeGoal(expandNodes(ab));
+	makeStart(expandUntilDoors(b));
+	dropKey(expandUntilDoors(b), key2);
+	dropKey(expandUntilDoors(aa), key3);
+	makeGoal(expandUntilDoors(ab));
 }
 
 // only possible by changing mapping
@@ -468,10 +469,10 @@ export function addDoors1(grid) {
 	const randomPivot = pickOne(allNodes);
 	const [ a, b ] = splitMaze(randomPivot, key2);
 	const [ aa, ab ] = splitMaze(a, key3); // aa is linked to a. ab is linked to aa
-	makeStart(expandNodes(b));
-	dropKey(expandNodes(b), key3);
-	dropKey(expandNodes(aa), key2);
-	makeGoal(expandNodes(ab));
+	makeStart(expandUntilDoors(b));
+	dropKey(expandUntilDoors(b), key3);
+	dropKey(expandUntilDoors(aa), key2);
+	makeGoal(expandUntilDoors(ab));
 }
 
 // Fisher-Yates shuffle
@@ -504,11 +505,11 @@ export function addDoors2(grid) {
 	const [ ba, bb ] = splitMaze(b, key2); // ba is linked to aa. bb is linked to ba
 	
 	// ab <-> aa <-> ba <-> bb
-	makeStart(expandNodes(ba));
-	dropKey(expandNodes(ba), key3);
-	dropKey(expandNodes(bb), key2);
-	dropKey(expandNodes(aa), key1);
-	makeGoal(expandNodes(ab));
+	makeStart(expandUntilDoors(ba));
+	dropKey(expandUntilDoors(ba), key3);
+	dropKey(expandUntilDoors(bb), key2);
+	dropKey(expandUntilDoors(aa), key1);
+	makeGoal(expandUntilDoors(ab));
 }
 /*
 export function addDoors3(grid) {
@@ -521,20 +522,21 @@ export function addDoors3(grid) {
 	const [ bba, bbb ] = splitMaze(bb, BLUE); // aaa is linked to aa. aab is linked to aaa
 		// abb <-> aba <-> aa <-> ba <-> bba <-> bbb
 
-	makeStart(expandNodes(ba));
-	dropKey(expandNodes(ba), YELLOW);
-	dropKey(expandNodes(ba), BLUE);
+	makeStart(expandUntilDoors(ba));
+	dropKey(expandUntilDoors(ba), YELLOW);
+	dropKey(expandUntilDoors(ba), BLUE);
 	
-	dropKey(expandNodes(bba), RED);
-	dropKey(expandNodes(bbb), YELLOW);
+	dropKey(expandUntilDoors(bba), RED);
+	dropKey(expandUntilDoors(bbb), YELLOW);
 
-	dropKey(expandNodes(aa), BLUE);
-	makeGoal(expandNodes(abb));
+	dropKey(expandUntilDoors(aa), BLUE);
+	makeGoal(expandUntilDoors(abb));
 }
 */
 
 // use bfs to find all freely linked nodes
-export function expandNodes(node) {
+export function expandNodes(node, listNeighbors) {
+	assert(typeof(listNeighbors) === 'function');
 	const visited = new Set();
 	const stack = [];
 	stack.push(node);
@@ -545,8 +547,7 @@ export function expandNodes(node) {
 		const current = stack.pop();
 		
 		// find unvisited neighbors
-		const unvisited = current.
-			nonDoorLinks().
+		const unvisited = listNeighbors(current).
 			filter(item => !visited.has(item.cell));
 
 		for (const item of unvisited) {
@@ -558,8 +559,8 @@ export function expandNodes(node) {
 	return [ ...visited.values() ];
 }
 
-export function reachable(src, dest) {
-
+export function reachable(src, dest, listNeighbors) {
+	assert(typeof(listNeighbors) === 'function', `Parameter listNeighbors must be a function but is ${typeof(listNeighbors)}`);
 	const visited = new Set();
 	const stack = [];
 	stack.push(src);
@@ -570,8 +571,7 @@ export function reachable(src, dest) {
 		const current = stack.pop();
 		
 		// find unvisited neighbors
-		const unvisited = current.
-			nonDoorLinks().
+		const unvisited = listNeighbors(current).
 			filter(item => !visited.has(item.cell));
 
 		for (const item of unvisited) {
@@ -591,7 +591,7 @@ function splitMaze(pivot, keyType) {
 	let valid = false;
 	do {
 		// pick a random cell
-		const expanse = expandNodes(pivot);
+		const expanse = expandUntilDoors(pivot);
 		const randomCell = pickOne(expanse);
 
 		const links = randomCell.nonDoorLinks();
@@ -604,11 +604,11 @@ function splitMaze(pivot, keyType) {
 			// upgrade linkType
 			randomCell.makeDoor(doorLink.dir, keyType);
 
-			if (reachable(randomCell, pivot)) {
+			if (reachable(randomCell, pivot, n => n.nonDoorLinks())) {
 				return [ randomCell, doorLink.cell ];
 			}
 			else {
-				assert (reachable(doorLink.cell, pivot), "Something went wrong while making doors");
+				assert (reachable(doorLink.cell, pivot, n => n.nonDoorLinks()), "Something went wrong while making doors");
 				return [ doorLink.cell, randomCell ]; 
 			}
 		}
