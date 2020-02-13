@@ -7,6 +7,7 @@ import {
 	DOOR_TILE_BLUE, DOOR_TILE_YELLOW, DOOR_TILE_RED,
 	ALL_KEYS
 } from "./constants";
+import { bfsGenerator } from "@amarillion/helixgraph/src/pathFinding.js";
 
 /*
 Generate a maze
@@ -455,8 +456,6 @@ export function genMazeAndAddDoors(w, h, doorFunc = addDoors2) {
 	}
 }
 
-const expandUntilDoors = (cells) => expandNodes(cells, n => n.nonDoorLinks());
-	
 // possible with regular mapping
 export function addDoors0(grid) {
 	const [ , key2, key3 ] = shuffle(ALL_KEYS);
@@ -543,57 +542,21 @@ export function addDoors3(grid) {
 }
 */
 
+const expandUntilDoors = (cells) => expandNodes(cells, n => n.nonDoorLinks());
+
 // use bfs to find all freely linked nodes
 export function expandNodes(node, listNeighbors) {
 	assert(typeof(listNeighbors) === 'function');
-	const visited = new Set();
-	const stack = [];
-	stack.push(node);
-	visited.add(node);
-
-	while(stack.length > 0) {
-
-		const current = stack.pop();
-		
-		// find unvisited neighbors
-		const unvisited = listNeighbors(current).
-			map(([,node]) => node).
-			filter(node => !visited.has(node));
-
-		for (const node of unvisited) {
-			visited.add(node);
-			stack.push(node);
-		}
-	}
-
-	return [ ...visited.values() ];
+	return [ ...bfsGenerator(node, listNeighbors) ];
 }
 
 export function reachable(src, dest, listNeighbors) {
 	assert(typeof(listNeighbors) === 'function', `Parameter listNeighbors must be a function but is ${typeof(listNeighbors)}`);
-	const visited = new Set();
-	const stack = [];
-	stack.push(src);
-	visited.add(src);
-
-	while(stack.length > 0) {
-
-		const current = stack.pop();
-		
-		// find unvisited neighbors
-		const unvisited = listNeighbors(current).
-			map(([,node]) => node).
-			filter(node => !visited.has(node));
-
-		for (const node of unvisited) {
-			if (node === dest) {
-				return true; // found!
-			}
-			visited.add(node);
-			stack.push(node);
+	for (const node of bfsGenerator(src, listNeighbors)) {
+		if (node === dest) {
+			return true; // found!
 		}
 	}
-
 	return false; // not found
 }
 
