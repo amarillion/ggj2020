@@ -14,6 +14,7 @@
 	"author": "Martijn van Iersel",
 	"license": "MIT",
 	"dependencies": {
+		"@amarillion/helixgraph": "^0.2.0",
 		"phaser-ce": "^2.14.0"
 	},
 	"devDependencies": {
