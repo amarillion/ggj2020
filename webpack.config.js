@@ -27,9 +27,9 @@ const config = {
 			template: "./src/index.html",
 			filename: "index.html", //relative to root of the application
 		}),
-		new CopyWebpackPlugin([
+		new CopyWebpackPlugin({ patterns: [
 			{ from: "assets", to: "assets" },
-		]),
+		]}),
 	],
 
 	devServer: {
